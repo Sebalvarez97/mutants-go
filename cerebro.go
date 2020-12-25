@@ -92,27 +92,27 @@ func isMutant(dna [][]byte) bool {
 		//fmt.Printf("\nRows %v : %+q - %v | %+q - %v \n", ri, row1, row1, row2, row2)
 		for ci := 0; ci < len(row1); ci++ {
 			result1 := checkNext(ci, row1[ci], row1)
+			if result1 >= 3 {
+				ms++
+			}
 			if ms > 1 {
 				break
 			}
 			result2 := checkNext(ci, row2[ci], row2)
+			if result2 >= 3 {
+				ms++
+			}
 			if ms > 1 {
 				break
 			}
 			result3 := checkDiagonalUpRight(ri, ci, row1[ci], dna)
+			if result3 >= 3 {
+				ms++
+			}
 			if ms > 1 {
 				break
 			}
 			result4 := checkDiagonalDownLeft(ri, ci, row1[ci], dna)
-			if result1 >= 3 {
-				ms++
-			}
-			if result2 >= 3 {
-				ms++
-			}
-			if result3 >= 3 {
-				ms++
-			}
 			if result4 >= 3 {
 				ms++
 			}
