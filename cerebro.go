@@ -31,7 +31,7 @@ func checkNext(x int, v byte, row []byte) int {
 	return 0
 }
 
-func checkDiagonal(x int, y int, v byte, a [][]byte) int {
+func checkDiagonalUpRight(x int, y int, v byte, a [][]byte) int {
 	xi := x + 1
 	yi := y + 1
 	if xi >= len(a) {
@@ -45,7 +45,29 @@ func checkDiagonal(x int, y int, v byte, a [][]byte) int {
 	//fmt.Printf("\nCheckDiagonal in %v|%v: \n", x, y)
 	//fmt.Printf("Comparing : %v to %v \n", v, vi)
 	if v == vi {
-		cd := checkDiagonal(xi, yi, vi, a)
+		cd := checkDiagonalUpRight(xi, yi, vi, a)
+		if cd <= 3 {
+			return cd + 1
+		}
+	}
+	return 0
+}
+
+func checkDiagonalDownLeft(x int, y int, v byte, a [][]byte) int {
+	xi := x - 1
+	yi := y - 1
+	if xi < 0 {
+		return 0
+	}
+	row := a[xi]
+	if yi < 0 {
+		return 0
+	}
+	vi := row[yi]
+	//fmt.Printf("\nCheckDiagonal in %v|%v: \n", x, y)
+	//fmt.Printf("Comparing : %v to %v \n", v, vi)
+	if v == vi {
+		cd := checkDiagonalDownLeft(xi, yi, vi, a)
 		if cd <= 3 {
 			return cd + 1
 		}
@@ -74,7 +96,8 @@ func isMutant(dna [][]byte) bool {
 			//fmt.Printf("Subrows: %v | %v \n", sr1, sr2)
 			result1 := checkNext(ci, row1[ci], sr1)
 			result2 := checkNext(ci, row2[ci], sr2)
-			result3 := checkDiagonal(ri, ci, row1[ci], dna)
+			result3 := checkDiagonalUpRight(ri, ci, row1[ci], dna)
+			result4 := checkDiagonalDownLeft(ri, ci, row1[ci], dna)
 			if result1 >= 3 {
 				ms++
 			}
@@ -82,6 +105,9 @@ func isMutant(dna [][]byte) bool {
 				ms++
 			}
 			if result3 >= 3 {
+				ms++
+			}
+			if result4 >= 3 {
 				ms++
 			}
 			//fmt.Printf("Results of checking: %v | %v | %v \n", result1, result2, result3)
