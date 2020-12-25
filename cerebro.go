@@ -22,8 +22,8 @@ func checkNext(x int, v byte, row []byte) int {
 	}
 	//fmt.Printf("\nCheckRight in %v|%v: \n", x, y)
 	//fmt.Printf("Comparing : %v to %v \n", v, (row)[y])
-	if v == (row)[y] {
-		cn := checkNext(y, (row)[y], row)
+	if v == row[y] {
+		cn := checkNext(y, row[y], row)
 		if cn <= 3 {
 			return cn + 1
 		}
@@ -54,9 +54,9 @@ func checkDiagonalUpRight(x int, y int, v byte, a [][]byte) int {
 }
 
 func checkDiagonalDownLeft(x int, y int, v byte, a [][]byte) int {
-	xi := x - 1
+	xi := x + 1
 	yi := y - 1
-	if xi < 0 {
+	if xi >= len(a) {
 		return 0
 	}
 	row := a[xi]
@@ -91,12 +91,18 @@ func isMutant(dna [][]byte) bool {
 		row2 := and[ri]
 		//fmt.Printf("\nRows %v : %+q - %v | %+q - %v \n", ri, row1, row1, row2, row2)
 		for ci := 0; ci < len(row1); ci++ {
-			sr1 := row1[ci:]
-			sr2 := row2[ci:]
-			//fmt.Printf("Subrows: %v | %v \n", sr1, sr2)
-			result1 := checkNext(ci, row1[ci], sr1)
-			result2 := checkNext(ci, row2[ci], sr2)
+			result1 := checkNext(ci, row1[ci], row1)
+			if ms > 1 {
+				break
+			}
+			result2 := checkNext(ci, row2[ci], row2)
+			if ms > 1 {
+				break
+			}
 			result3 := checkDiagonalUpRight(ri, ci, row1[ci], dna)
+			if ms > 1 {
+				break
+			}
 			result4 := checkDiagonalDownLeft(ri, ci, row1[ci], dna)
 			if result1 >= 3 {
 				ms++
@@ -122,8 +128,16 @@ func main() {
 
 	fmt.Println("Hello, I'm cerebro.")
 
-	input := [...]string{"ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}
-
+	input := [...]string{
+		"AAAATTTT",
+		"TTAAATTT",
+		"CCGGGCCC",
+		"TTAAATTT",
+		"CCGGGCCC",
+		"TTAAATTT",
+		"CCGGGCCC",
+		"TTAAATTT",
+	}
 	//fmt.Printf("Printing input: %+q \n", input)
 
 	dna := make([][]byte, len(input))
