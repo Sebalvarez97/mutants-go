@@ -21,6 +21,7 @@ No-Mutant &rarr; [
         "CCCTTA",
         "TCACTG"
     ]
+    
 Mutant &rarr; [
         "ATGCGA",
         "CAGTGC",
