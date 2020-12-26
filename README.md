@@ -13,6 +13,22 @@ If the API found 2 or more sequences like that in the matrix input, the dna is m
 
 Here we have two examples from a No-Mutant and a Mutant.
 
+No-Mutant &rarr; [
+        "ATGCGA",
+        "CAGTGC",
+        "TTATGT",
+        "AGAGTG",
+        "CCCTTA",
+        "TCACTG"
+    ]
+Mutant &rarr; [
+        "ATGCGA",
+        "CAGTGC",
+        "TTATGT",
+        "AGAAGG",
+        "CCCCTA",
+        "TCACTG"
+    ]
 ##### REQUEST:
 POST &rarr; /mutant
 
