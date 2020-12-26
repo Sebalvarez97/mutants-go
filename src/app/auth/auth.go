@@ -64,7 +64,7 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		},
 		Authorizator: func(data interface{}, c *gin.Context) bool {
 			//function to authorize the client (could be by identifying the client)
-			if v, ok := data.(*User); ok && v.UserName == "admin" {
+			if v, ok := data.(*User); ok && (v.UserName == "admin" || v.UserName == "magneto"){
 				return true
 			}
 
