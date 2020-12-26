@@ -52,7 +52,7 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			password := loginVals.Password
 
 			//add repository to validate user
-			if (userID == "admin" && password == "admin") || (userID == "test" && password == "test") {
+			if (userID == "admin" && password == "admin") || (userID == "magneto" && password == "magneto") {
 				return &User{
 					UserName:  userID,
 					LastName:  "Bo-Yi",
