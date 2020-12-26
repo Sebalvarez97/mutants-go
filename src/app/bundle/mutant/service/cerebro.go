@@ -2,7 +2,7 @@ package service
 
 import (
 	"fmt"
-	errors "github.com/Sebalvarez97/mutants/app/common"
+	errors "github.com/Sebalvarez97/mutants/src/app/common"
 )
 
 type CerebroServiceImpl struct{}

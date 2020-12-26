@@ -1,6 +1,6 @@
 package service
 
-import errors "github.com/Sebalvarez97/mutants/app/common"
+import errors "github.com/Sebalvarez97/mutants/src/app/common"
 
 type MutantServiceImpl struct{}
 

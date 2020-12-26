@@ -1,16 +1,18 @@
 package main
 
 import (
-	"github.com/Sebalvarez97/mutants/app/auth"
+	"github.com/Sebalvarez97/mutants/src/app/auth"
+	bundle "github.com/Sebalvarez97/mutants/src/app/bundle/mutant/controller"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
 	"os"
-	bundle "github.com/Sebalvarez97/mutants/app/bundle/mutant/controller"
 )
 
 func main() {
+	log.Printf("Setting up server...\n")
+
 	port := os.Getenv("PORT")
 	r := gin.New()
 	r.Use(gin.Logger())
@@ -19,6 +21,8 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+
+	log.Printf("Running on port: %v\n", port)
 
 	authMiddleware, err := auth.GetAuthMiddleware()
 
@@ -32,9 +36,7 @@ func main() {
 		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
 	})
 
-	auth := r.Group("/auth")
-	auth.POST("/login", authMiddleware.LoginHandler)
-	auth.GET("/refresh_token", authMiddleware.RefreshHandler)
+	r.Group("/auth").POST("/login", authMiddleware.LoginHandler).GET("/refresh_token", authMiddleware.RefreshHandler)
 
 	mutant := r.Group("/mutant")
 	mutant.Use(authMiddleware.MiddlewareFunc())

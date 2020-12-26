@@ -1,8 +1,8 @@
 package controller
 
 import (
-	. "github.com/Sebalvarez97/mutants/app/bundle/mutant/service"
-	errors "github.com/Sebalvarez97/mutants/app/common"
+	. "github.com/Sebalvarez97/mutants/src/app/bundle/mutant/service"
+	errors "github.com/Sebalvarez97/mutants/src/app/common"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
