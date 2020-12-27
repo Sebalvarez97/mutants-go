@@ -1,7 +1,6 @@
 FROM golang:1.15
-# create a working directory
-WORKDIR /go/src/app
-# add source code
-ADD src src
-# run main.go
-CMD ["go", "run", "src/server.go"]
+RUN mkdir /app
+ADD src /app
+WORKDIR /app
+RUN go build -o server .
+CMD ["/app/server"]
