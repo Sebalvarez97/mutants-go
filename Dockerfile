@@ -1,6 +1,6 @@
 FROM golang:1.15
 RUN mkdir /app
-ADD src /app
-WORKDIR /app
+ADD . /app
+WORKDIR /app/src
 RUN go build -o server .
-CMD ["/app/server"]
+CMD ["/app/src/server"]
