@@ -1,0 +1,30 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: "2020-12-28T02:50:58Z"
+  finalizers:
+    - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app: mutants-api
+  name: mutants-api-service
+  namespace: mutants
+  resourceVersion: "392262"
+  selfLink: /api/v1/namespaces/mutants/services/mutants-api-service
+  uid: 7deff47c-58a3-4b45-b14f-ce87fafdce5c
+spec:
+  clusterIP: 10.8.6.86
+  externalTrafficPolicy: Cluster
+  ports:
+    - name: http
+      nodePort: 30385
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: mutants-api
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+      - ip: 104.197.202.46
