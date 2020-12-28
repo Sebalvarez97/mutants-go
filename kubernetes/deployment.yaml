@@ -55,7 +55,7 @@ spec:
           terminationMessagePolicy: File
           env:
             - name: MONGO_URI
-              value: "mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017"
+              value: "mongodb://mongod-0.mongo,mongod-1.mongo,mongod-2.mongo:27017"
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
