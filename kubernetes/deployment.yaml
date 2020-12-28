@@ -2,13 +2,13 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   annotations:
-    deployment.kubernetes.io/revision: "3"
-    gcb-build-id: 12fca307-e2a2-4b7f-b773-a63e209c52b5
+    deployment.kubernetes.io/revision: "4"
+    gcb-build-id: 92d4001e-c306-49ea-9b97-85d4e10df376
     gcb-trigger-id: 0692f685-b890-47d4-a0f5-d4a299c75502
     kubectl.kubernetes.io/last-applied-configuration: |
-      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"deployment.kubernetes.io/revision":"1","gcb-build-id":"12fca307-e2a2-4b7f-b773-a63e209c52b5","gcb-trigger-id":"0692f685-b890-47d4-a0f5-d4a299c75502"},"creationTimestamp":"2020-12-28T02:41:14Z","generation":1,"labels":{"app":"mutants-api","app.kubernetes.io/managed-by":"gcp-cloud-build-deploy","app.kubernetes.io/name":"mutants-api","app.kubernetes.io/version":"1154fa7fef56944c82ca43c5ba6bb34476ef1878"},"name":"mutants-api","namespace":"mutants","resourceVersion":"389700","selfLink":"/apis/apps/v1/namespaces/mutants/deployments/mutants-api","uid":"3950e4d2-a16f-4b51-ba33-d18f57086d12"},"spec":{"progressDeadlineSeconds":600,"replicas":3,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"mutants-api"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"gcb-build-id":"12fca307-e2a2-4b7f-b773-a63e209c52b5","gcb-trigger-id":"0692f685-b890-47d4-a0f5-d4a299c75502"},"creationTimestamp":null,"labels":{"app":"mutants-api","app.kubernetes.io/managed-by":"gcp-cloud-build-deploy","app.kubernetes.io/name":"mutants-api","app.kubernetes.io/version":"1154fa7fef56944c82ca43c5ba6bb34476ef1878"}},"spec":{"containers":[{"image":"gcr.io/mutants-299814/github.com/sebalvarez97/mutants@sha256:07750bd839b7846c882195ba627f7e52d0fea7c2d4f0bea097a950db3bc071da","imagePullPolicy":"IfNotPresent","name":"mutants-1","resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30}}},"status":{"availableReplicas":3,"conditions":[{"lastTransitionTime":"2020-12-28T02:41:42Z","lastUpdateTime":"2020-12-28T02:41:42Z","message":"Deployment has minimum availability.","reason":"MinimumReplicasAvailable","status":"True","type":"Available"},{"lastTransitionTime":"2020-12-28T02:41:14Z","lastUpdateTime":"2020-12-28T02:41:42Z","message":"ReplicaSet \"mutants-api-858c6fcd66\" has successfully progressed.","reason":"NewReplicaSetAvailable","status":"True","type":"Progressing"}],"observedGeneration":1,"readyReplicas":3,"replicas":3,"updatedReplicas":3}}
+      {"apiVersion":"apps/v1","kind":"Deployment","metadata":{"annotations":{"deployment.kubernetes.io/revision":"3","gcb-build-id":"92d4001e-c306-49ea-9b97-85d4e10df376","gcb-trigger-id":"0692f685-b890-47d4-a0f5-d4a299c75502"},"creationTimestamp":"2020-12-28T02:41:14Z","generation":3,"labels":{"app":"mutants-api","app.kubernetes.io/managed-by":"gcp-cloud-build-deploy","app.kubernetes.io/name":"mutants-api","app.kubernetes.io/version":"1154fa7fef56944c82ca43c5ba6bb34476ef1878"},"name":"mutants-api","namespace":"mutants","resourceVersion":"402194","selfLink":"/apis/apps/v1/namespaces/mutants/deployments/mutants-api","uid":"3950e4d2-a16f-4b51-ba33-d18f57086d12"},"spec":{"progressDeadlineSeconds":600,"replicas":3,"revisionHistoryLimit":10,"selector":{"matchLabels":{"app":"mutants-api"}},"strategy":{"rollingUpdate":{"maxSurge":"25%","maxUnavailable":"25%"},"type":"RollingUpdate"},"template":{"metadata":{"annotations":{"gcb-build-id":"92d4001e-c306-49ea-9b97-85d4e10df376","gcb-trigger-id":"0692f685-b890-47d4-a0f5-d4a299c75502"},"creationTimestamp":null,"labels":{"app":"mutants-api","app.kubernetes.io/managed-by":"gcp-cloud-build-deploy","app.kubernetes.io/name":"mutants-api","app.kubernetes.io/version":"1154fa7fef56944c82ca43c5ba6bb34476ef1878"}},"spec":{"containers":[{"image":"gcr.io/mutants-299814/github.com/sebalvarez97/mutants@sha256:13c12b17a37c8feb8b595a91eead59e11bb9c312ed75026d560c9a3963771963","imagePullPolicy":"IfNotPresent","name":"mutants-1","ports":[{"containerPort":8080,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File"}],"dnsPolicy":"ClusterFirst","restartPolicy":"Always","schedulerName":"default-scheduler","securityContext":{},"terminationGracePeriodSeconds":30}}},"status":{"availableReplicas":3,"conditions":[{"lastTransitionTime":"2020-12-28T02:41:42Z","lastUpdateTime":"2020-12-28T02:41:42Z","message":"Deployment has minimum availability.","reason":"MinimumReplicasAvailable","status":"True","type":"Available"},{"lastTransitionTime":"2020-12-28T02:41:14Z","lastUpdateTime":"2020-12-28T03:29:53Z","message":"ReplicaSet \"mutants-api-5fdbb974d6\" has successfully progressed.","reason":"NewReplicaSetAvailable","status":"True","type":"Progressing"}],"observedGeneration":3,"readyReplicas":3,"replicas":3,"updatedReplicas":3}}
   creationTimestamp: "2020-12-28T02:41:14Z"
-  generation: 3
+  generation: 4
   labels:
     app: mutants-api
     app.kubernetes.io/managed-by: gcp-cloud-build-deploy
@@ -16,7 +16,7 @@ metadata:
     app.kubernetes.io/version: 1154fa7fef56944c82ca43c5ba6bb34476ef1878
   name: mutants-api
   namespace: mutants
-  resourceVersion: "402194"
+  resourceVersion: "410617"
   selfLink: /apis/apps/v1/namespaces/mutants/deployments/mutants-api
   uid: 3950e4d2-a16f-4b51-ba33-d18f57086d12
 spec:
@@ -34,7 +34,7 @@ spec:
   template:
     metadata:
       annotations:
-        gcb-build-id: 12fca307-e2a2-4b7f-b773-a63e209c52b5
+        gcb-build-id: 92d4001e-c306-49ea-9b97-85d4e10df376
         gcb-trigger-id: 0692f685-b890-47d4-a0f5-d4a299c75502
       creationTimestamp: null
       labels:
@@ -44,7 +44,7 @@ spec:
         app.kubernetes.io/version: 1154fa7fef56944c82ca43c5ba6bb34476ef1878
     spec:
       containers:
-        - image: gcr.io/mutants-299814/github.com/sebalvarez97/mutants@sha256:07750bd839b7846c882195ba627f7e52d0fea7c2d4f0bea097a950db3bc071da
+        - image: gcr.io/mutants-299814/github.com/sebalvarez97/mutants@sha256:13c12b17a37c8feb8b595a91eead59e11bb9c312ed75026d560c9a3963771963
           imagePullPolicy: IfNotPresent
           name: mutants-1
           ports:
@@ -68,12 +68,12 @@ status:
       status: "True"
       type: Available
     - lastTransitionTime: "2020-12-28T02:41:14Z"
-      lastUpdateTime: "2020-12-28T03:29:53Z"
-      message: ReplicaSet "mutants-api-5fdbb974d6" has successfully progressed.
+      lastUpdateTime: "2020-12-28T04:02:10Z"
+      message: ReplicaSet "mutants-api-5dd994df97" has successfully progressed.
       reason: NewReplicaSetAvailable
       status: "True"
       type: Progressing
-  observedGeneration: 3
+  observedGeneration: 4
   readyReplicas: 3
   replicas: 3
   updatedReplicas: 3
