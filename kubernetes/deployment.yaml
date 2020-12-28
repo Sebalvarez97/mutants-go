@@ -53,6 +53,9 @@ spec:
           resources: {}
           terminationMessagePath: /dev/termination-log
           terminationMessagePolicy: File
+          env:
+            - name: MONGO_URI
+              value: "mongodb://mongod-0.mongo,mongod-1.mongo,mongod-2.mongo:27017"
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
