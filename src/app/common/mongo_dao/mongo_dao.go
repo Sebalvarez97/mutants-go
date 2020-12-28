@@ -9,6 +9,8 @@ import (
 )
 
 const MongoNotFoundErr = "mongo: no documents in result"
+const mongoUriEnv = "MONGO_URI"
+const defaultMongoUri = "mongodb://localhost:27017"
 
 type MongoDao struct {
 	Db string
@@ -19,7 +21,10 @@ func NewMongoDao(db string) *MongoDao {
 }
 
 func (i MongoDao) connect() (*mongo.Client, error) {
-	uri := os.Getenv("MONGO_URI")
+	uri := defaultMongoUri
+	if u := os.Getenv(mongoUriEnv); u != "" {
+		uri = os.Getenv(mongoUriEnv)
+	}
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	return client, err

@@ -6,7 +6,7 @@ import (
 
 type CerebroServiceImpl struct{}
 
-func (i CerebroServiceImpl) IsMutant(dna [][]byte) (bool, *errors.ApiErrorImpl) {
+func (i CerebroServiceImpl) IsMutant(dna [][]byte) (bool, int, *errors.ApiErrorImpl) {
 	and := transpose(dna)
 	ms := 0
 	for ri := 0; ri < len(dna); ri++ {
@@ -44,7 +44,7 @@ func (i CerebroServiceImpl) IsMutant(dna [][]byte) (bool, *errors.ApiErrorImpl) 
 		}
 
 	}
-	return ms > 1, nil
+	return ms > 1, ms, nil
 }
 
 func transpose(a [][]byte) [][]byte {

@@ -10,7 +10,7 @@ import (
 type MutantServiceImpl struct{}
 
 type CerebroService interface {
-	IsMutant(input [][]byte) (bool, *errors.ApiErrorImpl)
+	IsMutant(input [][]byte) (bool, int, *errors.ApiErrorImpl)
 }
 
 var cerebro CerebroService = CerebroServiceImpl{}
@@ -26,11 +26,11 @@ func (i MutantServiceImpl) IsMutant(input []string) (bool, *errors.ApiErrorImpl)
 	if err != nil {
 		return false, err
 	}
-	isMutant, err := cerebro.IsMutant(dna)
+	isMutant, sequences, err := cerebro.IsMutant(dna)
 	if err != nil {
 		return false, err
 	}
-	if err := repository.Insert(NewDna([][]byte{}, isMutant, 0)); err != nil {
+	if err := repository.Insert(NewDna(dna, isMutant, sequences)); err != nil {
 		return false, err
 	}
 	return isMutant, nil
