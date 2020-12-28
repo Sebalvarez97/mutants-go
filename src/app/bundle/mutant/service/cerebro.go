@@ -1,25 +1,13 @@
 package service
 
 import (
-	"fmt"
-	errors "github.com/Sebalvarez97/mutants/src/app/common"
+	"github.com/Sebalvarez97/mutants/src/app/common/errors"
 )
 
 type CerebroServiceImpl struct{}
 
-func (i CerebroServiceImpl) IsMutant(input []string) (bool, *errors.ApiErrorImpl) {
-
-	dna := make([][]byte, len(input))
-	//fmt.Printf("%T\n\n", dna)
-	for i, v := range input {
-		dna[i] = []byte(v)
-	}
-	and, err := transposeAndValidate(dna)
-
-	if err != nil {
-		return false, err
-	}
-
+func (i CerebroServiceImpl) IsMutant(dna [][]byte) (bool, *errors.ApiErrorImpl) {
+	and := transpose(dna)
 	ms := 0
 	for ri := 0; ri < len(dna); ri++ {
 		if ms > 1 {
@@ -59,22 +47,14 @@ func (i CerebroServiceImpl) IsMutant(input []string) (bool, *errors.ApiErrorImpl
 	return ms > 1, nil
 }
 
-func transposeAndValidate(a [][]byte) ([][]byte, *errors.ApiErrorImpl) {
+func transpose(a [][]byte) [][]byte {
 	newArr := make([][]byte, len(a))
 	for i := 0; i < len(a); i++ {
-		if len(a[i]) != len(a) {
-			err := errors.BadRequestError(fmt.Errorf("invalid input, it isn't a NxN matrix, this could cause an Internal Error"))
-			return newArr, &err
-		}
 		for j := 0; j < len(a[0]); j++ {
-			if !isValidDna(a[i][j]) {
-				err := errors.BadRequestError(fmt.Errorf("invalid nitrogen base found: %q ", a[i][j]))
-				return newArr, &err
-			}
 			newArr[j] = append(newArr[j], a[i][j])
 		}
 	}
-	return newArr, nil
+	return newArr
 }
 
 func checkNext(x int, v byte, row []byte) int {
@@ -129,20 +109,4 @@ func checkDiagonalDownLeft(x int, y int, v byte, a [][]byte) int {
 		}
 	}
 	return 0
-}
-
-var validInputs = []byte{
-	byte('A'),
-	byte('T'),
-	byte('G'),
-	byte('C'),
-}
-
-func isValidDna(bn byte) bool {
-	for _, v := range validInputs {
-		if v == bn {
-			return true
-		}
-	}
-	return false
 }
