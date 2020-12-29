@@ -64,6 +64,33 @@ func (i MongoDao) FindMany(limit int64, filter bson.D, collectionName string) (*
 	}
 }
 
+func (i MongoDao) FindAll(filter bson.D, collectionName string) (*mongo.Cursor, error) {
+	client, conErr := i.connect()
+	if conErr != nil {
+		return nil, conErr
+	} else {
+		collection := client.Database(i.Db).Collection(collectionName)
+		cur, err := collection.Find(context.TODO(), filter)
+		if err != nil {
+			disconErr := disconnect(client)
+			if disconErr != nil {
+				return cur, disconErr
+			}
+			return cur, err
+		}
+		curErr := cur.Err()
+		if curErr != nil {
+			disconErr := disconnect(client)
+			if disconErr != nil {
+				return cur, disconErr
+			}
+			return cur, curErr
+		}
+		err = disconnect(client)
+		return cur, err
+	}
+}
+
 func (i MongoDao) InsertOne(document interface{}, collectionName string) error {
 	client, conErr := i.connect()
 	if conErr != nil {

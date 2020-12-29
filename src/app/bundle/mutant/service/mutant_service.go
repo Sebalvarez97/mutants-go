@@ -38,6 +38,25 @@ func (i MutantServiceImpl) IsMutant(input []string) (bool, *errors.ApiErrorImpl)
 	return isMutant, nil
 }
 
+func (i MutantServiceImpl) GetMutantStats() (*Stats, *errors.ApiErrorImpl) {
+	mutants, err := repository.FindAllMutants()
+	if err != nil {
+		return &Stats{}, err
+	}
+	humans, err := repository.FindAllHumans()
+	if err != nil {
+		return &Stats{}, err
+	}
+
+	m := len(mutants)
+	h := len(humans)
+	ratio := float64(0)
+	if h != 0 {
+		ratio = float64(m / h)
+	}
+	return NewStats(len(mutants), len(humans), ratio), nil
+}
+
 var validInputs = map[byte]bool{
 	byte('A'): true,
 	byte('T'): true,

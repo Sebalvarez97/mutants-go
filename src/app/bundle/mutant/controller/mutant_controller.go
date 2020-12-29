@@ -1,8 +1,9 @@
 package controller
 
 import (
+	"github.com/Sebalvarez97/mutants/src/app/bundle/mutant/domain"
 	. "github.com/Sebalvarez97/mutants/src/app/bundle/mutant/service"
-	errors2 "github.com/Sebalvarez97/mutants/src/app/common/errors"
+	errors "github.com/Sebalvarez97/mutants/src/app/common/errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -12,7 +13,8 @@ type IsMutantRequestBody struct {
 }
 
 type MutantService interface {
-	IsMutant(input []string) (bool, *errors2.ApiErrorImpl)
+	IsMutant(input []string) (bool, *errors.ApiErrorImpl)
+	GetMutantStats() (*domain.Stats, *errors.ApiErrorImpl)
 }
 
 var service MutantService = MutantServiceImpl{}
@@ -20,7 +22,7 @@ var service MutantService = MutantServiceImpl{}
 func IsMutantHandler(ctx *gin.Context) {
 	var json IsMutantRequestBody
 	if err := ctx.ShouldBind(&json); err != nil {
-		apiErr := errors2.BadRequestError(err)
+		apiErr := errors.BadRequestError(err)
 		ctx.JSON(apiErr.Code, apiErr)
 	}
 	is, apiErr := service.IsMutant(json.Dna)
@@ -31,5 +33,12 @@ func IsMutantHandler(ctx *gin.Context) {
 	} else {
 		ctx.Status(http.StatusForbidden)
 	}
+}
 
+func GetStatsHandler(ctx *gin.Context) {
+	stats, apiErr := service.GetMutantStats()
+	if apiErr != nil {
+		ctx.JSON(apiErr.Code, apiErr)
+	}
+	ctx.JSON(http.StatusOK, stats)
 }

@@ -42,6 +42,7 @@ func main() {
 	mutant.Use(authMiddleware.MiddlewareFunc())
 	{
 		mutant.POST("", bundle.IsMutantHandler)
+		mutant.GET("/stats", bundle.GetStatsHandler)
 	}
 
 	if err := http.ListenAndServe(":"+port, r); err != nil {

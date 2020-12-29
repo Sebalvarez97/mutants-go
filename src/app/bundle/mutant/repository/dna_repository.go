@@ -18,7 +18,39 @@ var dao = NewMongoDao("mutants")
 const collection = "dna"
 
 func (i DnaRepositoryImpl) FindAll() ([]Dna, *errors.ApiErrorImpl) {
+	dna, err := dao.FindAll(bson.D{}, collection)
+	if err != nil {
+		apiErr := errors.GenericError(err)
+		log.Print(apiErr.Error())
+		return nil, &apiErr
+	}
+	return mapToObjects(dna)
+}
+
+func (i DnaRepositoryImpl) FindMany() ([]Dna, *errors.ApiErrorImpl) {
 	dna, err := dao.FindMany(10, bson.D{}, collection)
+	if err != nil {
+		apiErr := errors.GenericError(err)
+		log.Print(apiErr.Error())
+		return nil, &apiErr
+	}
+	return mapToObjects(dna)
+}
+
+func (i DnaRepositoryImpl) FindAllMutants() ([]Dna, *errors.ApiErrorImpl) {
+	filter := bson.D{{"is_mutant", true}}
+	dna, err := dao.FindAll(filter, collection)
+	if err != nil {
+		apiErr := errors.GenericError(err)
+		log.Print(apiErr.Error())
+		return nil, &apiErr
+	}
+	return mapToObjects(dna)
+}
+
+func (i DnaRepositoryImpl) FindAllHumans() ([]Dna, *errors.ApiErrorImpl) {
+	filter := bson.D{{"is_mutant", false}}
+	dna, err := dao.FindAll(filter, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
