@@ -18,13 +18,13 @@ var dao = NewMongoDao("mutants")
 const collection = "dna"
 
 func (i DnaRepositoryImpl) FindAll() ([]Dna, *errors.ApiErrorImpl) {
-	trainers, err := dao.FindMany(10, bson.D{}, collection)
+	dna, err := dao.FindMany(10, bson.D{}, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
 		return nil, &apiErr
 	}
-	return mapToObjects(trainers)
+	return mapToObjects(dna)
 }
 
 func (i DnaRepositoryImpl) FindById(id string) (Dna, *errors.ApiErrorImpl) {
@@ -34,7 +34,7 @@ func (i DnaRepositoryImpl) FindById(id string) (Dna, *errors.ApiErrorImpl) {
 		apiErr := errors.GenericError(err)
 		return Dna{}, &apiErr
 	}
-	trainer, err := dao.FindOne(bson.D{{"_id", idObject}}, collection)
+	dna, err := dao.FindOne(bson.D{{"_id", idObject}}, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		if err.Error() == MongoNotFoundErr {
@@ -43,12 +43,52 @@ func (i DnaRepositoryImpl) FindById(id string) (Dna, *errors.ApiErrorImpl) {
 		log.Print(apiErr.Error())
 		return Dna{}, &apiErr
 	}
-	return mapToObject(trainer)
+	return mapToObject(dna)
+}
+
+func (i DnaRepositoryImpl) FindByDnaHash(hash string) (Dna, *errors.ApiErrorImpl) {
+	dna, err := dao.FindOne(bson.D{{"dna_hash", hash}}, collection)
+	if err != nil {
+		apiErr := errors.GenericError(err)
+		if err.Error() == MongoNotFoundErr {
+			apiErr = errors.NotFoundError(err)
+		}
+		log.Print(apiErr.Error())
+		return Dna{}, &apiErr
+	}
+	return mapToObject(dna)
 }
 
 func (i DnaRepositoryImpl) Insert(dna *Dna) *errors.ApiErrorImpl {
 	if err := dao.InsertOne(dna, collection); err != nil {
 		apiErr := errors.GenericError(err)
+		log.Print(apiErr.Error())
+		return &apiErr
+	}
+	return nil
+}
+
+func (i DnaRepositoryImpl) Upsert(dna *Dna) *errors.ApiErrorImpl {
+	err := i.Update(dna.DnaHash, dna)
+	if err != nil {
+		if err.Code == errors.NotFoundCode {
+			return i.Insert(dna)
+		}
+	}
+	return err
+}
+
+func (i DnaRepositoryImpl) Update(hash string, dna *Dna) *errors.ApiErrorImpl {
+	_, findErr := i.FindByDnaHash(hash)
+	if findErr != nil {
+		return findErr
+	}
+	updateErr := dao.UpdateOne(bson.D{{"dna_hash", hash}}, bson.D{{"$set", bson.D{{"chain", dna.Chain}, {"is_mutant", dna.IsMutant}, {"mutant_sequences", dna.MutantSequences}}}}, collection)
+	if updateErr != nil {
+		apiErr := errors.GenericError(updateErr)
+		if updateErr.Error() == MongoNotFoundErr {
+			apiErr = errors.NotFoundError(updateErr)
+		}
 		log.Print(apiErr.Error())
 		return &apiErr
 	}
@@ -67,12 +107,12 @@ func mapToObjects(cur *mongo.Cursor) ([]Dna, *errors.ApiErrorImpl) {
 }
 
 func mapToObject(document *mongo.SingleResult) (Dna, *errors.ApiErrorImpl) {
-	var trainer Dna
-	err := document.Decode(&trainer)
+	var dna Dna
+	err := document.Decode(&dna)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
-		return trainer, &apiErr
+		return dna, &apiErr
 	}
-	return trainer, nil
+	return dna, nil
 }

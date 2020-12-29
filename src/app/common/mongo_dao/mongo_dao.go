@@ -100,7 +100,7 @@ func (i MongoDao) InsertMany(document []interface{}, collectionName string) erro
 	}
 }
 
-func (i MongoDao) UpdateOne(filter bson.D, update bson.D, db string, collectionName string) error {
+func (i MongoDao) UpdateOne(filter bson.D, update bson.D, collectionName string) error {
 	client, conErr := i.connect()
 	if conErr != nil {
 		return conErr
