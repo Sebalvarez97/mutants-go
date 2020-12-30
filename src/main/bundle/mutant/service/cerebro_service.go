@@ -1,12 +1,6 @@
 package service
 
-import (
-	"github.com/Sebalvarez97/mutants/src/app/common/errors"
-)
-
-type CerebroServiceImpl struct{}
-
-func (i CerebroServiceImpl) IsMutant(dna [][]byte) (bool, int, *errors.ApiErrorImpl) {
+func IsMutantDna(dna [][]byte) (bool, int) {
 	and := transpose(dna)
 	ms := 0
 	for ri := 0; ri < len(dna); ri++ {
@@ -44,7 +38,7 @@ func (i CerebroServiceImpl) IsMutant(dna [][]byte) (bool, int, *errors.ApiErrorI
 		}
 
 	}
-	return ms > 1, ms, nil
+	return ms > 1, ms
 }
 
 func transpose(a [][]byte) [][]byte {

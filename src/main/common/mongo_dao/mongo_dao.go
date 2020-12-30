@@ -8,23 +8,26 @@ import (
 	"os"
 )
 
-const MongoNotFoundErr = "mongo: no documents in result"
 const mongoUriEnv = "MONGO_URI"
 const defaultMongoUri = "mongodb://localhost:27017"
+const mongoDbEnv = "MONGO_DB"
+const defaultMongoDb = "test"
 
-type MongoDao struct {
-	Db string
-}
+var db string
+var uri string
 
-func NewMongoDao(db string) *MongoDao {
-	return &MongoDao{Db: db}
-}
-
-func (i MongoDao) connect() (*mongo.Client, error) {
-	uri := defaultMongoUri
+func init() {
+	db = defaultMongoDb
+	if db := os.Getenv(mongoDbEnv); db != "" {
+		db = os.Getenv(mongoDbEnv)
+	}
+	uri = defaultMongoUri
 	if u := os.Getenv(mongoUriEnv); u != "" {
 		uri = os.Getenv(mongoUriEnv)
 	}
+}
+
+func connect() (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI(uri)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	return client, err
@@ -35,12 +38,12 @@ func disconnect(client *mongo.Client) error {
 	return err
 }
 
-func (i MongoDao) FindMany(limit int64, filter bson.D, collectionName string) (*mongo.Cursor, error) {
-	client, conErr := i.connect()
+func FindMany(limit int64, filter bson.D, collectionName string) (*mongo.Cursor, error) {
+	client, conErr := connect()
 	if conErr != nil {
 		return nil, conErr
 	} else {
-		collection := client.Database(i.Db).Collection(collectionName)
+		collection := client.Database(db).Collection(collectionName)
 		findOptions := options.Find()
 		findOptions.SetLimit(limit)
 		cur, err := collection.Find(context.TODO(), filter, findOptions)
@@ -64,12 +67,12 @@ func (i MongoDao) FindMany(limit int64, filter bson.D, collectionName string) (*
 	}
 }
 
-func (i MongoDao) FindAll(filter bson.D, collectionName string) (*mongo.Cursor, error) {
-	client, conErr := i.connect()
+func FindAll(filter bson.D, collectionName string) (*mongo.Cursor, error) {
+	client, conErr := connect()
 	if conErr != nil {
 		return nil, conErr
 	} else {
-		collection := client.Database(i.Db).Collection(collectionName)
+		collection := client.Database(db).Collection(collectionName)
 		cur, err := collection.Find(context.TODO(), filter)
 		if err != nil {
 			disconErr := disconnect(client)
@@ -91,12 +94,12 @@ func (i MongoDao) FindAll(filter bson.D, collectionName string) (*mongo.Cursor, 
 	}
 }
 
-func (i MongoDao) InsertOne(document interface{}, collectionName string) error {
-	client, conErr := i.connect()
+func InsertOne(document interface{}, collectionName string) error {
+	client, conErr := connect()
 	if conErr != nil {
 		return conErr
 	} else {
-		collection := client.Database(i.Db).Collection(collectionName)
+		collection := client.Database(db).Collection(collectionName)
 		_, err := collection.InsertOne(context.TODO(), document)
 		if err != nil {
 			disconErr := disconnect(client)
@@ -110,12 +113,12 @@ func (i MongoDao) InsertOne(document interface{}, collectionName string) error {
 	}
 }
 
-func (i MongoDao) InsertMany(document []interface{}, collectionName string) error {
-	client, conErr := i.connect()
+func InsertMany(document []interface{}, collectionName string) error {
+	client, conErr := connect()
 	if conErr != nil {
 		return conErr
 	} else {
-		collection := client.Database(i.Db).Collection(collectionName)
+		collection := client.Database(db).Collection(collectionName)
 		_, err := collection.InsertMany(context.TODO(), document)
 		if err != nil {
 			disconErr := disconnect(client)
@@ -127,12 +130,12 @@ func (i MongoDao) InsertMany(document []interface{}, collectionName string) erro
 	}
 }
 
-func (i MongoDao) UpdateOne(filter bson.D, update bson.D, collectionName string) error {
-	client, conErr := i.connect()
+func UpdateOne(filter bson.D, update bson.D, collectionName string) error {
+	client, conErr := connect()
 	if conErr != nil {
 		return conErr
 	} else {
-		collection := client.Database(i.Db).Collection(collectionName)
+		collection := client.Database(db).Collection(collectionName)
 		_, err := collection.UpdateOne(context.TODO(), filter, update)
 		if err != nil {
 			disconErr := disconnect(client)
@@ -144,12 +147,12 @@ func (i MongoDao) UpdateOne(filter bson.D, update bson.D, collectionName string)
 	}
 }
 
-func (i MongoDao) FindOne(filter bson.D, collectionName string) (*mongo.SingleResult, error) {
-	client, conErr := i.connect()
+func FindOne(filter bson.D, collectionName string) (*mongo.SingleResult, error) {
+	client, conErr := connect()
 	if conErr != nil {
 		return nil, conErr
 	} else {
-		collection := client.Database(i.Db).Collection(collectionName)
+		collection := client.Database(db).Collection(collectionName)
 		result := collection.FindOne(context.TODO(), filter)
 		resultErr := result.Err()
 		if resultErr != nil {
@@ -162,12 +165,12 @@ func (i MongoDao) FindOne(filter bson.D, collectionName string) (*mongo.SingleRe
 	}
 }
 
-func (i MongoDao) Delete(filter bson.D, collectionName string) error {
-	client, conErr := i.connect()
+func Delete(filter bson.D, collectionName string) error {
+	client, conErr := connect()
 	if conErr != nil {
 		return conErr
 	} else {
-		collection := client.Database(i.Db).Collection(collectionName)
+		collection := client.Database(db).Collection(collectionName)
 		_, err := collection.DeleteMany(context.TODO(), filter)
 		if err != nil {
 			disconErr := disconnect(client)

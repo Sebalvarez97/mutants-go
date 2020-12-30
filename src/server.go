@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Sebalvarez97/mutants/src/app/auth"
-	bundle "github.com/Sebalvarez97/mutants/src/app/bundle/mutant/controller"
+	"github.com/Sebalvarez97/mutants/src/main/auth"
+	bundle "github.com/Sebalvarez97/mutants/src/main/bundle/mutant/controller"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"log"
