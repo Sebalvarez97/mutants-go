@@ -16,7 +16,9 @@ func TestNxMMatrix(t *testing.T) {
 		"TTATGT",
 		"AGAAGG",
 		"TCACTG"}
-	_, err := IsMutant(sa)
+
+	service := NewMutantService(nil, nil)
+	_, err := service.IsMutant(sa)
 	if err == nil || err.Message != fmt.Sprintf(errors.BadRequestErrorMessage, invalidInputNotAnNxNMatrixMessage) {
 		t.Error(fmt.Sprintf(serviceError, "an invalid matrix is valid"))
 	}
@@ -27,7 +29,9 @@ func TestToShortMatrix(t *testing.T) {
 		"ATGCGA",
 		"CAGTGC",
 		"TTATGT"}
-	_, err := IsMutant(sa)
+
+	service := NewMutantService(nil, nil)
+	_, err := service.IsMutant(sa)
 	if err == nil || err.Message != fmt.Sprintf(errors.BadRequestErrorMessage, invalidInputMatrixToShortMessage) {
 		t.Error(fmt.Sprintf(serviceError, "an invalid matrix is valid"))
 	}
@@ -42,7 +46,9 @@ func TestInvalidCharacterMatrix(t *testing.T) {
 		"AGAAGG",
 		"CCCCTA",
 		"TCACTG"}
-	_, err := IsMutant(sa)
+
+	service := NewMutantService(nil, nil)
+	_, err := service.IsMutant(sa)
 	if err == nil || err.Message != fmt.Sprintf(errors.BadRequestErrorMessage, fmt.Sprintf(invalidNitrogenBaseFoundMessage, b)) {
 		t.Error(fmt.Sprintf(serviceError, "an invalid matrix is valid"))
 	}
@@ -81,15 +87,17 @@ func TestIsMutantOk(t *testing.T) {
 		"CCCCTA",
 		"TCACTG"}
 
-	Cerebro = CerebroServiceImplMock{}
-	Repository = DnaRepositoryImplMock{}
+	cerebro := CerebroServiceImplMock{}
+	repository := DnaRepositoryImplMock{}
 	cerebroServiceIsMutantMock = func(input [][]byte) (bool, int) {
 		return true, 2
 	}
 	dnaRepositoryUpsertMock = func(dna *Dna) *errors.ApiErrorImpl {
 		return nil
 	}
-	im, err := IsMutant(sa)
+
+	service := NewMutantService(repository, cerebro)
+	im, err := service.IsMutant(sa)
 	if im != true || err != nil {
 		t.Error(fmt.Sprintf(serviceError, "this mocked dna is mutant"))
 	}
@@ -104,15 +112,17 @@ func TestIsNotMutantOk(t *testing.T) {
 		"CCCCTA",
 		"TCACTG"}
 
-	Cerebro = CerebroServiceImplMock{}
-	Repository = DnaRepositoryImplMock{}
+	cerebro := CerebroServiceImplMock{}
+	repository := DnaRepositoryImplMock{}
 	cerebroServiceIsMutantMock = func(input [][]byte) (bool, int) {
 		return false, 0
 	}
 	dnaRepositoryUpsertMock = func(dna *Dna) *errors.ApiErrorImpl {
 		return nil
 	}
-	im, err := IsMutant(sa)
+
+	service := NewMutantService(repository, cerebro)
+	im, err := service.IsMutant(sa)
 	if im != false || err != nil {
 		t.Error(fmt.Sprintf(serviceError, "this mocked dna is human"))
 	}
@@ -127,8 +137,8 @@ func TestIsMutantFailToInsert(t *testing.T) {
 		"CCCCTA",
 		"TCACTG"}
 
-	Cerebro = CerebroServiceImplMock{}
-	Repository = DnaRepositoryImplMock{}
+	cerebro := CerebroServiceImplMock{}
+	repository := DnaRepositoryImplMock{}
 	cerebroServiceIsMutantMock = func(input [][]byte) (bool, int) {
 		return false, 0
 	}
@@ -136,14 +146,16 @@ func TestIsMutantFailToInsert(t *testing.T) {
 		apiErr := errors.GenericError(fmt.Errorf("error on insert opeartion: %s", "generic"))
 		return &apiErr
 	}
-	im, err := IsMutant(sa)
+
+	service := NewMutantService(repository, cerebro)
+	im, err := service.IsMutant(sa)
 	if im != false || err == nil || err.Message != fmt.Sprintf("Server failed to perform request because of %s", fmt.Sprintf("error on insert opeartion: %s", "generic")) {
 		t.Error(fmt.Sprintf(serviceError, "this has to fail because an insertion error"))
 	}
 }
 
 func TestGetMutantStatsOk(t *testing.T) {
-	Repository = DnaRepositoryImplMock{}
+	repository := DnaRepositoryImplMock{}
 	m := 40
 	h := 100
 	ratio := 0.4
@@ -153,14 +165,16 @@ func TestGetMutantStatsOk(t *testing.T) {
 	dnaRepositoryFindAllMutantsMock = func() ([]Dna, *errors.ApiErrorImpl) {
 		return make([]Dna, m), nil
 	}
-	s, err := GetMutantStats()
+
+	service := NewMutantService(repository, nil)
+	s, err := service.GetMutantStats()
 	if s == nil || err != nil || s.Humans != h || s.Mutants != m || s.Ratio != ratio {
 		t.Error(fmt.Sprintf(serviceError, "fail to get stats"))
 	}
 }
 
 func TestGetMutantStatsOkWithCeroHumans(t *testing.T) {
-	Repository = DnaRepositoryImplMock{}
+	repository := DnaRepositoryImplMock{}
 	m := 40
 	h := 0
 	ratio := 1.0
@@ -170,14 +184,16 @@ func TestGetMutantStatsOkWithCeroHumans(t *testing.T) {
 	dnaRepositoryFindAllMutantsMock = func() ([]Dna, *errors.ApiErrorImpl) {
 		return make([]Dna, m), nil
 	}
-	s, err := GetMutantStats()
+
+	service := NewMutantService(repository, nil)
+	s, err := service.GetMutantStats()
 	if s == nil || err != nil || s.Humans != h || s.Mutants != m || s.Ratio != ratio {
 		t.Error(fmt.Sprintf(serviceError, "fail to get stats"))
 	}
 }
 
 func TestGetMutantStatsOkWithCeroMutants(t *testing.T) {
-	Repository = DnaRepositoryImplMock{}
+	repository := DnaRepositoryImplMock{}
 	m := 0
 	h := 100
 	ratio := 0.0
@@ -187,7 +203,9 @@ func TestGetMutantStatsOkWithCeroMutants(t *testing.T) {
 	dnaRepositoryFindAllMutantsMock = func() ([]Dna, *errors.ApiErrorImpl) {
 		return make([]Dna, m), nil
 	}
-	s, err := GetMutantStats()
+
+	service := NewMutantService(repository, nil)
+	s, err := service.GetMutantStats()
 	if s == nil || err != nil || s.Humans != h || s.Mutants != m || s.Ratio != ratio {
 		t.Error(fmt.Sprintf(serviceError, "fail to get stats"))
 	}

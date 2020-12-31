@@ -22,6 +22,7 @@ type User struct {
 
 func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 
+	//add os.Getenv() for some params
 	return jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte("secret"),
