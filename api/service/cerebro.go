@@ -1,6 +1,14 @@
 package service
 
-func IsMutantDna(dna [][]byte) (bool, int) {
+import "github.com/Sebalvarez97/mutants/api/interfaces"
+
+type CerebroServiceImpl struct{}
+
+func NewCerebroService() interfaces.CerebroService {
+	return CerebroServiceImpl{}
+}
+
+func (i CerebroServiceImpl) IsMutantDna(dna [][]byte) (bool, int) {
 	and := transpose(dna)
 	ms := 0
 	for ri := 0; ri < len(dna); ri++ {

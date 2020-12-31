@@ -2,56 +2,28 @@ package repository
 
 import (
 	"context"
-	. "github.com/Sebalvarez97/mutants/api/model"
 	"github.com/Sebalvarez97/mutants/api/errors"
-	dao "github.com/Sebalvarez97/mutants/api/dao"
+	"github.com/Sebalvarez97/mutants/api/interfaces"
+	"github.com/Sebalvarez97/mutants/api/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"log"
 )
 
-type MongoDao interface {
-	FindAll(filter bson.D, collectionName string) (*mongo.Cursor, error)
-	FindMany(limit int64, filter bson.D, collectionName string) (*mongo.Cursor, error)
-	FindOne(filter bson.D, collectionName string) (*mongo.SingleResult, error)
-	InsertOne(document interface{}, collectionName string) error
-	UpdateOne(filter bson.D, update bson.D, collectionName string) error
+type DnaRepositoryImpl struct {
+	dao interfaces.MongoDao
 }
 
-type MongoDaoImpl struct{}
-
-func (m MongoDaoImpl) FindAll(filter bson.D, collectionName string) (*mongo.Cursor, error) {
-	return dao.FindAll(filter, collectionName)
-}
-
-func (m MongoDaoImpl) FindMany(limit int64, filter bson.D, collectionName string) (*mongo.Cursor, error) {
-	return dao.FindMany(limit, filter, collectionName)
-}
-
-func (m MongoDaoImpl) FindOne(filter bson.D, collectionName string) (*mongo.SingleResult, error) {
-	return dao.FindOne(filter, collectionName)
-}
-
-func (m MongoDaoImpl) InsertOne(document interface{}, collectionName string) error {
-	return dao.InsertOne(document, collectionName)
-}
-
-func (m MongoDaoImpl) UpdateOne(filter bson.D, update bson.D, collectionName string) error {
-	return dao.UpdateOne(filter, update, collectionName)
-}
-
-var MongoMutantsDao MongoDao
-
-func init() {
-	MongoMutantsDao = MongoDaoImpl{}
+func NewDnaRepository(dao interfaces.MongoDao) interfaces.DnaRepository {
+	return DnaRepositoryImpl{dao: dao}
 }
 
 const collection = "dna"
 const MongoNotFoundErr = "mongo: no documents in result"
 
-func FindAll() ([]Dna, *errors.ApiErrorImpl) {
-	dna, err := MongoMutantsDao.FindAll(bson.D{}, collection)
+func (i DnaRepositoryImpl) FindAll() ([]model.Dna, *errors.ApiErrorImpl) {
+	dna, err := i.dao.FindAll(bson.D{}, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
@@ -60,8 +32,8 @@ func FindAll() ([]Dna, *errors.ApiErrorImpl) {
 	return mapToObjects(dna)
 }
 
-func FindMany() ([]Dna, *errors.ApiErrorImpl) {
-	dna, err := MongoMutantsDao.FindMany(10, bson.D{}, collection)
+func (i DnaRepositoryImpl) FindMany() ([]model.Dna, *errors.ApiErrorImpl) {
+	dna, err := i.dao.FindMany(10, bson.D{}, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
@@ -70,9 +42,9 @@ func FindMany() ([]Dna, *errors.ApiErrorImpl) {
 	return mapToObjects(dna)
 }
 
-func FindAllMutants() ([]Dna, *errors.ApiErrorImpl) {
+func (i DnaRepositoryImpl) FindAllMutants() ([]model.Dna, *errors.ApiErrorImpl) {
 	filter := bson.D{{"is_mutant", true}}
-	dna, err := MongoMutantsDao.FindAll(filter, collection)
+	dna, err := i.dao.FindAll(filter, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
@@ -81,28 +53,28 @@ func FindAllMutants() ([]Dna, *errors.ApiErrorImpl) {
 	return mapToObjects(dna)
 }
 
-func FindById(id string) (Dna, *errors.ApiErrorImpl) {
+func (i DnaRepositoryImpl) FindById(id string) (model.Dna, *errors.ApiErrorImpl) {
 	idObject, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		log.Print(err)
 		apiErr := errors.GenericError(err)
-		return Dna{}, &apiErr
+		return model.Dna{}, &apiErr
 	}
-	dna, err := MongoMutantsDao.FindOne(bson.D{{"_id", idObject}}, collection)
+	dna, err := i.dao.FindOne(bson.D{{"_id", idObject}}, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		if err.Error() == MongoNotFoundErr {
 			apiErr = errors.NotFoundError(err)
 		}
 		log.Print(apiErr.Error())
-		return Dna{}, &apiErr
+		return model.Dna{}, &apiErr
 	}
 	return mapToObject(dna)
 }
 
-func FindAllHumans() ([]Dna, *errors.ApiErrorImpl) {
+func (i DnaRepositoryImpl) FindAllHumans() ([]model.Dna, *errors.ApiErrorImpl) {
 	filter := bson.D{{"is_mutant", false}}
-	dna, err := MongoMutantsDao.FindAll(filter, collection)
+	dna, err := i.dao.FindAll(filter, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
@@ -111,21 +83,21 @@ func FindAllHumans() ([]Dna, *errors.ApiErrorImpl) {
 	return mapToObjects(dna)
 }
 
-func FindByDnaHash(hash string) (Dna, *errors.ApiErrorImpl) {
-	dna, err := MongoMutantsDao.FindOne(bson.D{{"dna_hash", hash}}, collection)
+func (i DnaRepositoryImpl) FindByDnaHash(hash string) (model.Dna, *errors.ApiErrorImpl) {
+	dna, err := i.dao.FindOne(bson.D{{"dna_hash", hash}}, collection)
 	if err != nil {
 		apiErr := errors.GenericError(err)
 		if err.Error() == MongoNotFoundErr {
 			apiErr = errors.NotFoundError(err)
 		}
 		log.Print(apiErr.Error())
-		return Dna{}, &apiErr
+		return model.Dna{}, &apiErr
 	}
 	return mapToObject(dna)
 }
 
-func Insert(dna *Dna) *errors.ApiErrorImpl {
-	if err := MongoMutantsDao.InsertOne(dna, collection); err != nil {
+func (i DnaRepositoryImpl) Insert(dna *model.Dna) *errors.ApiErrorImpl {
+	if err := i.dao.InsertOne(dna, collection); err != nil {
 		apiErr := errors.GenericError(err)
 		log.Print(apiErr.Error())
 		return &apiErr
@@ -133,22 +105,22 @@ func Insert(dna *Dna) *errors.ApiErrorImpl {
 	return nil
 }
 
-func Upsert(dna *Dna) *errors.ApiErrorImpl {
-	err := Update(dna.DnaHash, dna)
+func (i DnaRepositoryImpl) Upsert(dna *model.Dna) *errors.ApiErrorImpl {
+	err := i.Update(dna.DnaHash, dna)
 	if err != nil {
 		if err.Code == errors.NotFoundCode {
-			return Insert(dna)
+			return i.Insert(dna)
 		}
 	}
 	return err
 }
 
-func Update(hash string, dna *Dna) *errors.ApiErrorImpl {
-	_, findErr := FindByDnaHash(hash)
+func (i DnaRepositoryImpl) Update(hash string, dna *model.Dna) *errors.ApiErrorImpl {
+	_, findErr := i.FindByDnaHash(hash)
 	if findErr != nil {
 		return findErr
 	}
-	updateErr := MongoMutantsDao.UpdateOne(bson.D{{"dna_hash", hash}}, bson.D{{"$set", bson.D{{"chain", dna.Chain}, {"is_mutant", dna.IsMutant}, {"mutant_sequences", dna.MutantSequences}}}}, collection)
+	updateErr := i.dao.UpdateOne(bson.D{{"dna_hash", hash}}, bson.D{{"$set", bson.D{{"chain", dna.Chain}, {"is_mutant", dna.IsMutant}, {"mutant_sequences", dna.MutantSequences}}}}, collection)
 	if updateErr != nil {
 		apiErr := errors.GenericError(updateErr)
 		if updateErr.Error() == MongoNotFoundErr {
@@ -160,8 +132,8 @@ func Update(hash string, dna *Dna) *errors.ApiErrorImpl {
 	return nil
 }
 
-func mapToObjects(cur *mongo.Cursor) ([]Dna, *errors.ApiErrorImpl) {
-	var results []Dna
+func mapToObjects(cur *mongo.Cursor) ([]model.Dna, *errors.ApiErrorImpl) {
+	var results []model.Dna
 	err := cur.All(context.TODO(), &results)
 	if err != nil {
 		apiErr := errors.GenericError(err)
@@ -171,8 +143,8 @@ func mapToObjects(cur *mongo.Cursor) ([]Dna, *errors.ApiErrorImpl) {
 	return results, nil
 }
 
-func mapToObject(document *mongo.SingleResult) (Dna, *errors.ApiErrorImpl) {
-	var dna Dna
+func mapToObject(document *mongo.SingleResult) (model.Dna, *errors.ApiErrorImpl) {
+	var dna model.Dna
 	err := document.Decode(&dna)
 	if err != nil {
 		apiErr := errors.GenericError(err)

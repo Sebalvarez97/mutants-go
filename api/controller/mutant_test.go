@@ -37,14 +37,16 @@ func TestGetIsMutant(t *testing.T) {
 		values := map[string][]string{"dna": input}
 		jsonValue, _ := json.Marshal(values)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
 			return true, nil
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.POST("/mutant", IsMutantHandler)
+		router.POST("/mutant", controller.IsMutantHandler)
 
 		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
 		assert.NoError(t, err)
@@ -61,14 +63,16 @@ func TestGetIsMutant(t *testing.T) {
 		values := map[string][]string{"dna": input}
 		jsonValue, _ := json.Marshal(values)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
 			return false, nil
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.POST("/mutant", IsMutantHandler)
+		router.POST("/mutant", controller.IsMutantHandler)
 
 		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
 		assert.NoError(t, err)
@@ -90,15 +94,17 @@ func TestGetIsMutantFail(t *testing.T) {
 		values := map[string][]string{"dna": input}
 		jsonValue, _ := json.Marshal(values)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
 			apiErr := errors.GenericError(fmt.Errorf("db failure"))
 			return false, &apiErr
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.POST("/mutant", IsMutantHandler)
+		router.POST("/mutant", controller.IsMutantHandler)
 
 		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
 		assert.NoError(t, err)
@@ -115,14 +121,16 @@ func TestGetIsMutantFail(t *testing.T) {
 		values := map[string][]string{"dna_chain": input}
 		jsonValue, _ := json.Marshal(values)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
 			return true, nil
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.POST("/mutant", IsMutantHandler)
+		router.POST("/mutant", controller.IsMutantHandler)
 
 		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
 		assert.NoError(t, err)
@@ -144,15 +152,17 @@ func TestIsMutantBadRequest(t *testing.T) {
 		values := map[string][]string{"dna": input}
 		jsonValue, _ := json.Marshal(values)
 
-		Service = MutantServiceImplMock{}
+		service :=  MutantServiceImplMock{}
 		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
 			apiErr := errors.BadRequestError(fmt.Errorf("invalid input, the matrix is to short, has to be 4x4 or bigger"))
 			return true, &apiErr
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.POST("/mutant", IsMutantHandler)
+		router.POST("/mutant", controller.IsMutantHandler)
 
 		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
 		assert.NoError(t, err)
@@ -171,15 +181,17 @@ func TestIsMutantBadRequest(t *testing.T) {
 		values := map[string][]string{"dna": input}
 		jsonValue, _ := json.Marshal(values)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
 			apiErr := errors.BadRequestError(fmt.Errorf("invalid input, it isn't a NxN matrix, this could cause an Internal Error"))
 			return true, &apiErr
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.POST("/mutant", IsMutantHandler)
+		router.POST("/mutant", controller.IsMutantHandler)
 
 		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
 		assert.NoError(t, err)
@@ -198,15 +210,17 @@ func TestIsMutantBadRequest(t *testing.T) {
 		values := map[string][]string{"dna": input}
 		jsonValue, _ := json.Marshal(values)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
 			apiErr := errors.BadRequestError(fmt.Errorf("invalid nitrogen base found: Z"))
 			return true, &apiErr
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.POST("/mutant", IsMutantHandler)
+		router.POST("/mutant", controller.IsMutantHandler)
 
 		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
 		assert.NoError(t, err)
@@ -227,14 +241,16 @@ func TestGetStatsOk(t *testing.T) {
 
 		stats := NewStats(40, 100, 0.4)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceGetMutantStats = func() (*Stats, *errors.ApiErrorImpl) {
 			return stats, nil
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.GET("/mutant/stats", GetStatsHandler)
+		router.GET("/mutant/stats", controller.GetStatsHandler)
 
 		request, err := http.NewRequest(http.MethodGet, "/mutant/stats", nil)
 		assert.NoError(t, err)
@@ -251,14 +267,16 @@ func TestGetStatsOk(t *testing.T) {
 
 		stats := NewStats(100, 25, 4.0)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceGetMutantStats = func() (*Stats, *errors.ApiErrorImpl) {
 			return stats, nil
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.GET("/mutant/stats", GetStatsHandler)
+		router.GET("/mutant/stats", controller.GetStatsHandler)
 
 		request, err := http.NewRequest(http.MethodGet, "/mutant/stats", nil)
 		assert.NoError(t, err)
@@ -275,14 +293,16 @@ func TestGetStatsOk(t *testing.T) {
 
 		stats := NewStats(100, 0, 1.0)
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceGetMutantStats = func() (*Stats, *errors.ApiErrorImpl) {
 			return stats, nil
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.GET("/mutant/stats", GetStatsHandler)
+		router.GET("/mutant/stats", controller.GetStatsHandler)
 
 		request, err := http.NewRequest(http.MethodGet, "/mutant/stats", nil)
 		assert.NoError(t, err)
@@ -301,15 +321,17 @@ func TestGetStatsFailure(t *testing.T) {
 
 	t.Run("Internal Server Error db", func(t *testing.T) {
 
-		Service = MutantServiceImplMock{}
+		service := MutantServiceImplMock{}
 		mutantServiceGetMutantStats = func() (*Stats, *errors.ApiErrorImpl) {
 			apiErr := errors.GenericError(fmt.Errorf("db error"))
 			return &Stats{}, &apiErr
 		}
 
+		controller := NewMutantController(service)
+
 		rr := httptest.NewRecorder()
 		router := gin.Default()
-		router.GET("/mutant/stats", GetStatsHandler)
+		router.GET("/mutant/stats", controller.GetStatsHandler)
 
 		request, err := http.NewRequest(http.MethodGet, "/mutant/stats", nil)
 		assert.NoError(t, err)

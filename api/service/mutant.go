@@ -5,68 +5,46 @@ import (
 	"encoding/hex"
 	"fmt"
 	"github.com/Sebalvarez97/mutants/api/errors"
-	. "github.com/Sebalvarez97/mutants/api/model"
-	. "github.com/Sebalvarez97/mutants/api/repository"
+	"github.com/Sebalvarez97/mutants/api/interfaces"
+	"github.com/Sebalvarez97/mutants/api/model"
 )
 
-type CerebroService interface {
-	IsMutantDna(input [][]byte) (bool, int)
-}
-type CerebroServiceImpl struct{}
-
-func (i CerebroServiceImpl) IsMutantDna(input [][]byte) (bool, int) {
-	return IsMutantDna(input)
+type MutantServiceImpl struct {
+	repository interfaces.DnaRepository
+	cerebro    interfaces.CerebroService
 }
 
-type DnaRepository interface {
-	Upsert(dna *Dna) *errors.ApiErrorImpl
-	FindAllMutants() ([]Dna, *errors.ApiErrorImpl)
-	FindAllHumans() ([]Dna, *errors.ApiErrorImpl)
-}
-type DnaRepositoryImpl struct{}
-
-func (i DnaRepositoryImpl) Upsert(dna *Dna) *errors.ApiErrorImpl {
-	return Upsert(dna)
-}
-func (i DnaRepositoryImpl) FindAllMutants() ([]Dna, *errors.ApiErrorImpl) {
-	return FindAllMutants()
-}
-func (i DnaRepositoryImpl) FindAllHumans() ([]Dna, *errors.ApiErrorImpl) {
-	return FindAllHumans()
-}
-
-var Cerebro CerebroService
-var Repository DnaRepository
-
-func init() {
-	Cerebro = CerebroServiceImpl{}
-	Repository = DnaRepositoryImpl{}
+func NewMutantService(repository interfaces.DnaRepository, cerebro interfaces.CerebroService) interfaces.MutantService {
+	return MutantServiceImpl{
+		repository: repository,
+		cerebro:    cerebro,
+	}
 }
 
 const invalidNitrogenBaseFoundMessage = "invalid nitrogen base found: %q"
 const invalidInputMatrixToShortMessage = "invalid input, the matrix is to short, has to be 4x4 or bigger"
 const invalidInputNotAnNxNMatrixMessage = "invalid input, it isn't a NxN matrix, this could cause an Internal Error"
 
-func IsMutant(input []string) (bool, *errors.ApiErrorImpl) {
+func (i MutantServiceImpl) IsMutant(input []string) (bool, *errors.ApiErrorImpl) {
 	chain, hash, err := validateInput(input)
 	if err != nil {
 		return false, err
 	}
-	isMutant, sequences := Cerebro.IsMutantDna(chain)
-	if err := Repository.Upsert(NewDna(chain, hash, isMutant, sequences)); err != nil {
+	isMutant, sequences := i.cerebro.IsMutantDna(chain)
+	if err := i.repository.Upsert(model.NewDna(chain, hash, isMutant, sequences)); err != nil {
 		return false, err
 	}
 	return isMutant, nil
 }
 
-func GetMutantStats() (*Stats, *errors.ApiErrorImpl) {
-	mutants, err := Repository.FindAllMutants()
+func (i MutantServiceImpl) GetMutantStats() (*model.Stats, *errors.ApiErrorImpl) {
+	mutants, err := i.repository.FindAllMutants()
 	if err != nil {
-		return &Stats{}, err
+		return &model.Stats{}, err
 	}
-	humans, err := Repository.FindAllHumans()
+	humans, err := i.repository.FindAllHumans()
 	if err != nil {
-		return &Stats{}, err
+		return &model.Stats{}, err
 	}
 
 	m := len(mutants)
@@ -75,7 +53,7 @@ func GetMutantStats() (*Stats, *errors.ApiErrorImpl) {
 	if h != 0 {
 		ratio = float64(m) / float64(h)
 	}
-	return NewStats(len(mutants), len(humans), ratio), nil
+	return model.NewStats(len(mutants), len(humans), ratio), nil
 }
 
 var validInputs = map[byte]bool{
