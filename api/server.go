@@ -14,10 +14,10 @@ import (
 )
 
 func main() {
-
+	setUpServer()
 }
 
-func setUṕServer() {
+func setUpServer() {
 	log.Printf("Setting up server...\n")
 
 	port := os.Getenv("PORT")
