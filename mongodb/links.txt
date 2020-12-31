@@ -1,0 +1,3 @@
+https://deeptiman.medium.com/mongodb-statefulset-in-kubernetes-87c2f5974821
+
+https://stackoverflow.com/questions/41732819/why-statefulsets-cant-a-stateless-pod-use-persistent-volumes
