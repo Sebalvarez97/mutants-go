@@ -31,6 +31,7 @@ func setUpServer() {
 
 	authMiddleWare := setUpAuth(r)
 
+	log.Println("Setting up services")
 	dao := dao2.NewMongoDao("mutants")
 
 	dnaRepository := repository.NewDnaRepository(dao)
@@ -45,15 +46,15 @@ func setUpServer() {
 		mutant.POST("", mutantController.IsMutantHandler)
 		mutant.GET("/stats", mutantController.GetStatsHandler)
 	}
+	log.Printf("Will run on port: %v\n", port)
 
 	if err := http.ListenAndServe(":"+port, r); err != nil {
 		log.Fatal(err)
 	}
-
-	log.Printf("Running on port: %v\n", port)
 }
 
 func setUpAuth(r *gin.Engine) gin.HandlerFunc {
+	log.Println("Setting up auth")
 	authMiddleware, err := auth.GetAuthMiddleware()
 
 	if err != nil {
@@ -70,6 +71,5 @@ func setUpAuth(r *gin.Engine) gin.HandlerFunc {
 
 	r.Group("/auth").POST("/login", authMiddleware.LoginHandler).GET("/refresh_token", authMiddleware.RefreshHandler)
 
-	log.Println("Set up auth")
 	return authMiddlewareFunc
 }
