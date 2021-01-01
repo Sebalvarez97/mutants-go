@@ -4,7 +4,7 @@ metadata:
   labels:
     app: mutants-api
   name: mutants-api
-  namespace: default
+  namespace: mutants
 spec:
   replicas: 3
   selector:
@@ -42,7 +42,7 @@ metadata:
   labels:
     app: mutants-api
   name: mutants-api-hpa-utia
-  namespace: default
+  namespace: mutants
 spec:
   maxReplicas: 5
   metrics:
@@ -50,7 +50,7 @@ spec:
         name: cpu
         targetAverageUtilization: 80
       type: Resource
-  minReplicas: 1
+  minReplicas: 3
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
