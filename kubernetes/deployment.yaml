@@ -26,12 +26,12 @@ spec:
               valueFrom:
                 configMapKeyRef:
                   key: MONGO_URI
-                  name: mutants-api-config-ayd1
+                  name: mutants-api-config-jlz7
             - name: MONGO_DB
               valueFrom:
                 configMapKeyRef:
                   key: MONGO_DB
-                  name: mutants-api-config-ayd1
+                  name: mutants-api-config-jlz7
           image: gcr.io/mutants-299814/github.com/sebalvarez97/mutants
           imagePullPolicy: IfNotPresent
           name: mutants-1
@@ -41,7 +41,7 @@ kind: HorizontalPodAutoscaler
 metadata:
   labels:
     app: mutants-api
-  name: mutants-api-hpa-utia
+  name: mutants-api-hpa-v0o6
   namespace: mutants
 spec:
   maxReplicas: 5
