@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: mutants-api
+  name: mutants-api
+  namespace: default
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: mutants-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: mutants-api
+    spec:
+      containers:
+        - env:
+            - name: MONGO_URI
+              valueFrom:
+                configMapKeyRef:
+                  key: MONGO_URI
+                  name: mutants-api-config-ayd1
+            - name: MONGO_DB
+              valueFrom:
+                configMapKeyRef:
+                  key: MONGO_DB
+                  name: mutants-api-config-ayd1
+          image: gcr.io/mutants-299814/github.com/sebalvarez97/mutants
+          imagePullPolicy: IfNotPresent
+          name: mutants-1
+---
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  labels:
+    app: mutants-api
+  name: mutants-api-hpa-utia
+  namespace: default
+spec:
+  maxReplicas: 5
+  metrics:
+    - resource:
+        name: cpu
+        targetAverageUtilization: 80
+      type: Resource
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: mutants-api
