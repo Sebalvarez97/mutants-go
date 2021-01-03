@@ -3,13 +3,18 @@ API RESTful to analize a dna chain to find mutant sequences.
 
 ## Hosting
 
-This API is hosted in Google Kubernetes Engine, using the structure detailed in the file Cloud_API_Architecture.png. The yaml sources needed to deploy it are in /kubernetes. For the mongodb statefulset the yaml is in /mongodb with the instructions to setup it.
+This API is hosted in Google Kubernetes Engine, using the structure detailed in the file /docs/arch/Cloud_API_Architecture.png. The yaml sources needed to deploy it are in /kubernetes. For the mongodb statefulset the yaml is in /mongodb with the instructions to setup it.
 
 As this is a kubernetes solution, it could be deployed in any other kubernetes engine (AWS, Openshift, etc).
 
 It is a scalable solution, this means that can perform well in low or big load.
 
 The public IP tu consume the API is http://104.197.202.46/
+
+## Docs
+The description of the kubernetes architecture is in /docs/arch.
+
+Also sequence diagrams of the two services are in /docs/sequences.
 
 ## Authentication
 The API is setted with JWT authentication consume endpoints.
@@ -117,7 +122,7 @@ Body:
 This endpopint allows you to get some statistics of the dna chains previously analized.
 
 The format of the response is the following:
-```josn
+```json
 {
   "count_mutant_dna": 40,
   "count_human_dna": 100,
@@ -142,7 +147,7 @@ Header: "Authentication: Bearer ${token}"
 200 OK
 
 Body:
-```josn
+```json
 {
   "count_mutant_dna": {quantity_of_mutants},
   "count_human_dna": {quantity_of_humans},
@@ -193,7 +198,7 @@ Body:
 ```json
 {
     "code": 400,
-    "message": "Value entered is not valid: ....."
+    "message": "Invalid value entered: ....."
 }
 ```
 &rarr; if the request is not the expected
@@ -204,7 +209,7 @@ Body:
 ```json
 {
     "code": 500,
-    "message": "VInternal error..."
+    "message": "Server failed to perform request because of..."
 }
 ```
 &rarr; if the server failed to perform the request
