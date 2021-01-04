@@ -48,14 +48,14 @@ Body:
     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE2MDkwMTU2MTAsImlkIjoibWFnbmV0byIsIm9yaWdfaWF0IjoxNjA5MDE0NzEwfQ.TlX3Y5tRqSkH-A5vvLvbE1VcCH6K_OhP1LWkK13IOS0"
 }
 ```
-You can find the JWT in the response body.token. This is used for authentication to the API sending it in header "Authentication: Bearer ${token}".
+You can find the JWT in the response body.token. This is used for authentication to the API sending it in header "Authorization: Bearer ${token}".
 
 ***Important*** The token expires every 15 minutes and you can refresh it if it was created less than 20 minutes ago. If you need to refresh it use this request:
 
 ##### REQUEST:
 GET &rarr; /auth/refresh_token 
 
-Header: "Authentication: Bearer ${token_you_want_to_refresh}"
+Header: "Authorization: Bearer ${token_you_want_to_refresh}"
 ##### RESPONSE:
 ```json
 {
@@ -98,7 +98,7 @@ Mutant &rarr; [
 ##### REQUEST:
 POST &rarr; /mutant
 
-Header: "Authentication: Bearer ${token}"
+Header: "Authorization: Bearer ${token}"
 
 Body: 
 ```json
@@ -141,7 +141,7 @@ count_mutant_dna / count_human_dna
 ##### REQUEST:
 GET &rarr; /mutant/stats
 
-Header: "Authentication: Bearer ${token}"
+Header: "Authorization: Bearer ${token}"
 
 ##### RESPONSE:
 200 OK
