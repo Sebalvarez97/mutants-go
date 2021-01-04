@@ -15,23 +15,21 @@ type MongoDaoImpl struct {
 }
 
 func NewMongoDao(db string) interfaces.MongoDao {
+	uri := "mongodb://localhost:27017"
+	if db := os.Getenv(mongoDbEnv); db != "" {
+		db = os.Getenv(mongoDbEnv)
+	}
+	if u := os.Getenv(mongoUriEnv); u != "" {
+		uri = os.Getenv(mongoUriEnv)
+	}
 	return MongoDaoImpl{
 		db:  db,
-		uri: "mongodb://localhost:27017",
+		uri: uri,
 	}
 }
 
 const mongoUriEnv = "MONGO_URI"
 const mongoDbEnv = "MONGO_DB"
-
-func (i MongoDaoImpl) init() {
-	if db := os.Getenv(mongoDbEnv); db != "" {
-		i.db = os.Getenv(mongoDbEnv)
-	}
-	if u := os.Getenv(mongoUriEnv); u != "" {
-		i.uri = os.Getenv(mongoUriEnv)
-	}
-}
 
 func (i MongoDaoImpl) connect() (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI(i.uri)
