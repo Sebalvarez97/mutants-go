@@ -7,32 +7,64 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"os"
+	"strconv"
+	"time"
 )
 
 type MongoDaoImpl struct {
-	db  string
-	uri string
+	db          string
+	uri         string
+	timeout     time.Duration
+	minPoolSize uint64
+	maxPoolSize uint64
 }
 
 func NewMongoDao(db string) interfaces.MongoDao {
 	uri := "mongodb://localhost:27017"
+	t, _ := time.ParseDuration("30s")
+	minPool, _ := strconv.ParseUint("100", 10, 64)
+	maxPool, _ := strconv.ParseUint("100", 10, 64)
 	if db := os.Getenv(mongoDbEnv); db != "" {
 		db = os.Getenv(mongoDbEnv)
 	}
 	if u := os.Getenv(mongoUriEnv); u != "" {
 		uri = os.Getenv(mongoUriEnv)
 	}
+	if to := os.Getenv(mongoTimeOutEnv); to != "" {
+		if dur, err := time.ParseDuration(to); err == nil {
+			t = dur
+		}
+	}
+	if mp := os.Getenv(mongoMinConnectionPool); mp != "" {
+		if ui64, err := strconv.ParseUint(mp, 10, 64); err == nil {
+			minPool = ui64
+		}
+	}
+	if mp := os.Getenv(mongoMaxConnectionPool); mp != "" {
+		if ui64, err := strconv.ParseUint(mp, 10, 64); err == nil {
+			maxPool = ui64
+		}
+	}
 	return MongoDaoImpl{
-		db:  db,
-		uri: uri,
+		db:          db,
+		uri:         uri,
+		timeout:     t,
+		minPoolSize: minPool,
+		maxPoolSize: maxPool,
 	}
 }
 
 const mongoUriEnv = "MONGO_URI"
 const mongoDbEnv = "MONGO_DB"
+const mongoTimeOutEnv = "MONGO_TIMEOUT"
+const mongoMinConnectionPool = "MONGO_MIN_POOL"
+const mongoMaxConnectionPool = "MONGO_MAX_POOL"
 
 func (i MongoDaoImpl) connect() (*mongo.Client, error) {
 	clientOptions := options.Client().ApplyURI(i.uri)
+	clientOptions.SetMinPoolSize(i.minPoolSize)
+	clientOptions.SetMaxPoolSize(i.maxPoolSize)
+	clientOptions.SetConnectTimeout(i.timeout)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	return client, err
 }
