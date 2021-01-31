@@ -5,6 +5,7 @@ import (
 	"github.com/Sebalvarez97/mutants/api/interfaces"
 	"github.com/Sebalvarez97/mutants/api/model"
 	"github.com/Sebalvarez97/mutants/api/util/matrix"
+	"math"
 )
 
 type MutantServiceImpl struct {
@@ -72,7 +73,7 @@ func (i MutantServiceImpl) GetMutantStats() (*model.Stats, *errors.ApiErrorImpl)
 		h := <-humans
 		ratio := 1.0
 		if h != 0 {
-			ratio = float64(m) / float64(h)
+			ratio = math.Round((float64(m)/float64(h))*100) / 100
 		}
 		return model.NewStats(m, h, ratio), nil
 	}
