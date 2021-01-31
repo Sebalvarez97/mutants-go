@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/Sebalvarez97/mutants/api/errors"
 	"github.com/Sebalvarez97/mutants/api/interfaces"
 	. "github.com/Sebalvarez97/mutants/api/model"
@@ -22,10 +23,12 @@ func (i MutantController) IsMutantHandler(ctx *gin.Context) {
 		apiErr := errors.BadRequestError(err)
 		ctx.JSON(apiErr.Code, apiErr)
 	}
-	is, apiErr := i.service.IsMutant(json.Dna)
-	if apiErr != nil {
+	if valid, message := json.IsValid(); !valid {
+		apiErr := errors.BadRequestError(fmt.Errorf(message))
 		ctx.JSON(apiErr.Code, apiErr)
-	} else if is {
+	}
+	is := i.service.IsMutant(json)
+	if is {
 		ctx.Status(http.StatusOK)
 	} else {
 		ctx.Status(http.StatusForbidden)

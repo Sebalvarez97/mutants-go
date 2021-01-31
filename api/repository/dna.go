@@ -105,14 +105,14 @@ func (i DnaRepositoryImpl) Insert(dna *model.Dna) *errors.ApiErrorImpl {
 	return nil
 }
 
-func (i DnaRepositoryImpl) Upsert(dna *model.Dna) *errors.ApiErrorImpl {
+func (i DnaRepositoryImpl) Upsert(dna *model.Dna) {
 	err := i.Update(dna.DnaHash, dna)
 	if err != nil {
 		if err.Code == errors.NotFoundCode {
-			return i.Insert(dna)
+			err = i.Insert(dna)
+			log.Print(err.Error())
 		}
 	}
-	return err
 }
 
 func (i DnaRepositoryImpl) Update(hash string, dna *model.Dna) *errors.ApiErrorImpl {
@@ -120,7 +120,7 @@ func (i DnaRepositoryImpl) Update(hash string, dna *model.Dna) *errors.ApiErrorI
 	if findErr != nil {
 		return findErr
 	}
-	updateErr := i.dao.UpdateOne(bson.D{{"dna_hash", hash}}, bson.D{{"$set", bson.D{{"chain", dna.Chain}, {"is_mutant", dna.IsMutant}, {"mutant_sequences", dna.MutantSequences}}}}, collection)
+	updateErr := i.dao.UpdateOne(bson.D{{"dna_hash", hash}}, bson.D{{"$set", bson.D{{"is_mutant", dna.IsMutant}, {"mutant_sequences", dna.MutantSequences}}}}, collection)
 	if updateErr != nil {
 		apiErr := errors.GenericError(updateErr)
 		if updateErr.Error() == MongoNotFoundErr {

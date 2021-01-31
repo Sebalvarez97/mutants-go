@@ -6,7 +6,7 @@ import (
 )
 
 type MutantService interface {
-	IsMutant(input []string) (bool, *errors.ApiErrorImpl)
+	IsMutant(dnaRequest model.IsMutantRequestBody) bool
 	GetMutantStats() (*model.Stats, *errors.ApiErrorImpl)
 }
 

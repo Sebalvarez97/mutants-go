@@ -6,7 +6,7 @@ import (
 )
 
 type DnaRepository interface {
-	Upsert(dna *model.Dna) *errors.ApiErrorImpl
+	Upsert(dna *model.Dna)
 	FindAllMutants() ([]model.Dna, *errors.ApiErrorImpl)
 	FindAllHumans() ([]model.Dna, *errors.ApiErrorImpl)
 }

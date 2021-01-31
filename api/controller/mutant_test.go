@@ -15,10 +15,10 @@ import (
 
 type MutantServiceImplMock struct{}
 
-var mutantServiceIsMutantMock func(input []string) (bool, *errors.ApiErrorImpl)
+var mutantServiceIsMutantMock func(body IsMutantRequestBody) bool
 
-func (i MutantServiceImplMock) IsMutant(input []string) (bool, *errors.ApiErrorImpl) {
-	return mutantServiceIsMutantMock(input)
+func (i MutantServiceImplMock) IsMutant(body IsMutantRequestBody) bool {
+	return mutantServiceIsMutantMock(body)
 }
 
 var mutantServiceGetMutantStats func() (*Stats, *errors.ApiErrorImpl)
@@ -38,8 +38,8 @@ func TestGetIsMutant(t *testing.T) {
 		jsonValue, _ := json.Marshal(values)
 
 		service := MutantServiceImplMock{}
-		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
-			return true, nil
+		mutantServiceIsMutantMock = func(body IsMutantRequestBody) bool {
+			return true
 		}
 
 		controller := NewMutantController(service)
@@ -64,8 +64,8 @@ func TestGetIsMutant(t *testing.T) {
 		jsonValue, _ := json.Marshal(values)
 
 		service := MutantServiceImplMock{}
-		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
-			return false, nil
+		mutantServiceIsMutantMock = func(body IsMutantRequestBody) bool {
+			return false
 		}
 
 		controller := NewMutantController(service)
@@ -88,33 +88,6 @@ func TestGetIsMutantFail(t *testing.T) {
 
 	gin.SetMode(gin.TestMode)
 
-	t.Run("Internal Server Db", func(t *testing.T) {
-
-		input := []string{"ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}
-		values := map[string][]string{"dna": input}
-		jsonValue, _ := json.Marshal(values)
-
-		service := MutantServiceImplMock{}
-		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
-			apiErr := errors.GenericError(fmt.Errorf("db failure"))
-			return false, &apiErr
-		}
-
-		controller := NewMutantController(service)
-
-		rr := httptest.NewRecorder()
-		router := gin.Default()
-		router.POST("/mutant", controller.IsMutantHandler)
-
-		request, err := http.NewRequest(http.MethodPost, "/mutant", bytes.NewReader(jsonValue))
-		assert.NoError(t, err)
-
-		router.ServeHTTP(rr, request)
-		assert.NoError(t, err)
-
-		assert.Equal(t, 500, rr.Code)
-	})
-
 	t.Run("Bad Request Binding Error", func(t *testing.T) {
 
 		input := []string{"ATGCGA", "CAGTGC", "TTATGT", "AGAAGG", "CCCCTA", "TCACTG"}
@@ -122,8 +95,8 @@ func TestGetIsMutantFail(t *testing.T) {
 		jsonValue, _ := json.Marshal(values)
 
 		service := MutantServiceImplMock{}
-		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
-			return true, nil
+		mutantServiceIsMutantMock = func(body IsMutantRequestBody) bool {
+			return true
 		}
 
 		controller := NewMutantController(service)
@@ -152,11 +125,7 @@ func TestIsMutantBadRequest(t *testing.T) {
 		values := map[string][]string{"dna": input}
 		jsonValue, _ := json.Marshal(values)
 
-		service :=  MutantServiceImplMock{}
-		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
-			apiErr := errors.BadRequestError(fmt.Errorf("invalid input, the matrix is to short, has to be 4x4 or bigger"))
-			return true, &apiErr
-		}
+		service := MutantServiceImplMock{}
 
 		controller := NewMutantController(service)
 
@@ -182,10 +151,6 @@ func TestIsMutantBadRequest(t *testing.T) {
 		jsonValue, _ := json.Marshal(values)
 
 		service := MutantServiceImplMock{}
-		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
-			apiErr := errors.BadRequestError(fmt.Errorf("invalid input, it isn't a NxN matrix, this could cause an Internal Error"))
-			return true, &apiErr
-		}
 
 		controller := NewMutantController(service)
 
@@ -211,10 +176,6 @@ func TestIsMutantBadRequest(t *testing.T) {
 		jsonValue, _ := json.Marshal(values)
 
 		service := MutantServiceImplMock{}
-		mutantServiceIsMutantMock = func(input []string) (bool, *errors.ApiErrorImpl) {
-			apiErr := errors.BadRequestError(fmt.Errorf("invalid nitrogen base found: Z"))
-			return true, &apiErr
-		}
 
 		controller := NewMutantController(service)
 
