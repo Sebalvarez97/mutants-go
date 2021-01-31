@@ -53,6 +53,17 @@ func (i DnaRepositoryImpl) FindAllMutants() ([]model.Dna, *errors.ApiErrorImpl) 
 	return mapToObjects(dna)
 }
 
+func (i DnaRepositoryImpl) FindNumberOfMutants() (int, *errors.ApiErrorImpl) {
+	filter := bson.D{{"is_mutant", true}}
+	count, err := i.dao.CountForCollection(filter, collection)
+	if err != nil {
+		apiErr := errors.GenericError(err)
+		log.Print(apiErr.Error())
+		return 0, &apiErr
+	}
+	return int(count), nil
+}
+
 func (i DnaRepositoryImpl) FindById(id string) (model.Dna, *errors.ApiErrorImpl) {
 	idObject, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
@@ -81,6 +92,17 @@ func (i DnaRepositoryImpl) FindAllHumans() ([]model.Dna, *errors.ApiErrorImpl) {
 		return nil, &apiErr
 	}
 	return mapToObjects(dna)
+}
+
+func (i DnaRepositoryImpl) FindNumberOfHumans() (int, *errors.ApiErrorImpl) {
+	filter := bson.D{{"is_mutant", false}}
+	count, err := i.dao.CountForCollection(filter, collection)
+	if err != nil {
+		apiErr := errors.GenericError(err)
+		log.Print(apiErr.Error())
+		return 0, &apiErr
+	}
+	return int(count), nil
 }
 
 func (i DnaRepositoryImpl) FindByDnaHash(hash string) (model.Dna, *errors.ApiErrorImpl) {

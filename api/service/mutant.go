@@ -45,20 +45,35 @@ func (i MutantServiceImpl) IsMutant(dnaRequest model.IsMutantRequestBody) bool {
 }
 
 func (i MutantServiceImpl) GetMutantStats() (*model.Stats, *errors.ApiErrorImpl) {
-	mutants, err := i.repository.FindAllMutants()
-	if err != nil {
-		return &model.Stats{}, err
-	}
-	humans, err := i.repository.FindAllHumans()
-	if err != nil {
-		return &model.Stats{}, err
-	}
 
-	m := len(mutants)
-	h := len(humans)
-	ratio := 1.0
-	if h != 0 {
-		ratio = float64(m) / float64(h)
+	mutants, humans, e := make(chan int), make(chan int), make(chan errors.ApiErrorImpl)
+
+	go func(chan int, chan errors.ApiErrorImpl) {
+		m, err := i.repository.FindNumberOfMutants()
+		if err != nil {
+			e <- *err
+		}
+		mutants <- m
+	}(mutants, e)
+
+	go func(chan int, chan errors.ApiErrorImpl) {
+		h, err := i.repository.FindNumberOfHumans()
+		if err != nil {
+			e <- *err
+		}
+		humans <- h
+	}(humans, e)
+
+	select {
+	case err := <-e:
+		return &model.Stats{}, &err
+	default:
+		m := <-mutants
+		h := <-humans
+		ratio := 1.0
+		if h != 0 {
+			ratio = float64(m) / float64(h)
+		}
+		return model.NewStats(m, h, ratio), nil
 	}
-	return model.NewStats(len(mutants), len(humans), ratio), nil
 }

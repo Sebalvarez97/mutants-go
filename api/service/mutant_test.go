@@ -17,17 +17,27 @@ func (i CerebroServiceImplMock) IsMutantDna(input [][]byte) (bool, int) {
 	return cerebroServiceIsMutantMock(input)
 }
 
-var dnaRepositoryFindAllMutantsMock func() ([]Dna, *errors.ApiErrorImpl)
-var dnaRepositoryFindAllHumansMock func() ([]Dna, *errors.ApiErrorImpl)
+var dnaRepositoryFindNumberOfHumansMock func() (int, *errors.ApiErrorImpl)
+var dnaRepositoryFindNumberOfMutantsMock func() (int, *errors.ApiErrorImpl)
 
 type DnaRepositoryImplMock struct{}
 
 func (i DnaRepositoryImplMock) FindAllMutants() ([]Dna, *errors.ApiErrorImpl) {
-	return dnaRepositoryFindAllMutantsMock()
+	panic("implement me")
 }
+
 func (i DnaRepositoryImplMock) FindAllHumans() ([]Dna, *errors.ApiErrorImpl) {
-	return dnaRepositoryFindAllHumansMock()
+	panic("implement me")
 }
+
+func (i DnaRepositoryImplMock) FindNumberOfHumans() (int, *errors.ApiErrorImpl) {
+	return dnaRepositoryFindNumberOfHumansMock()
+}
+
+func (i DnaRepositoryImplMock) FindNumberOfMutants() (int, *errors.ApiErrorImpl) {
+	return dnaRepositoryFindNumberOfMutantsMock()
+}
+
 func (i DnaRepositoryImplMock) Upsert(*Dna) {}
 
 func TestIsMutantOk(t *testing.T) {
@@ -81,11 +91,11 @@ func TestGetMutantStatsOk(t *testing.T) {
 	m := 40
 	h := 100
 	ratio := 0.4
-	dnaRepositoryFindAllHumansMock = func() ([]Dna, *errors.ApiErrorImpl) {
-		return make([]Dna, h), nil
+	dnaRepositoryFindNumberOfHumansMock = func() (int, *errors.ApiErrorImpl) {
+		return h, nil
 	}
-	dnaRepositoryFindAllMutantsMock = func() ([]Dna, *errors.ApiErrorImpl) {
-		return make([]Dna, m), nil
+	dnaRepositoryFindNumberOfMutantsMock = func() (int, *errors.ApiErrorImpl) {
+		return m, nil
 	}
 
 	service := NewMutantService(repository, nil)
@@ -100,11 +110,11 @@ func TestGetMutantStatsOkWithCeroHumans(t *testing.T) {
 	m := 40
 	h := 0
 	ratio := 1.0
-	dnaRepositoryFindAllHumansMock = func() ([]Dna, *errors.ApiErrorImpl) {
-		return make([]Dna, h), nil
+	dnaRepositoryFindNumberOfHumansMock = func() (int, *errors.ApiErrorImpl) {
+		return h, nil
 	}
-	dnaRepositoryFindAllMutantsMock = func() ([]Dna, *errors.ApiErrorImpl) {
-		return make([]Dna, m), nil
+	dnaRepositoryFindNumberOfMutantsMock = func() (int, *errors.ApiErrorImpl) {
+		return m, nil
 	}
 
 	service := NewMutantService(repository, nil)
@@ -119,11 +129,11 @@ func TestGetMutantStatsOkWithCeroMutants(t *testing.T) {
 	m := 0
 	h := 100
 	ratio := 0.0
-	dnaRepositoryFindAllHumansMock = func() ([]Dna, *errors.ApiErrorImpl) {
-		return make([]Dna, h), nil
+	dnaRepositoryFindNumberOfHumansMock = func() (int, *errors.ApiErrorImpl) {
+		return h, nil
 	}
-	dnaRepositoryFindAllMutantsMock = func() ([]Dna, *errors.ApiErrorImpl) {
-		return make([]Dna, m), nil
+	dnaRepositoryFindNumberOfMutantsMock = func() (int, *errors.ApiErrorImpl) {
+		return m, nil
 	}
 
 	service := NewMutantService(repository, nil)

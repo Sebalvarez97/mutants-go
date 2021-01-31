@@ -130,6 +130,26 @@ func (i MongoDaoImpl) FindAll(filter bson.D, collectionName string) (*mongo.Curs
 	}
 }
 
+func (i MongoDaoImpl) CountForCollection(filter bson.D, collectionName string) (int64, error) {
+	client, conErr := i.connect()
+	if conErr != nil {
+		return 0, conErr
+	} else {
+		collection := client.Database(i.db).Collection(collectionName)
+		count, err := collection.CountDocuments(context.TODO(), filter)
+		if err != nil {
+			disconErr := i.disconnect(client)
+			if disconErr != nil {
+				return count, disconErr
+			}
+			return count, err
+		}
+		err = i.disconnect(client)
+		return count, err
+	}
+
+}
+
 func (i MongoDaoImpl) InsertOne(document interface{}, collectionName string) error {
 	client, conErr := i.connect()
 	if conErr != nil {
