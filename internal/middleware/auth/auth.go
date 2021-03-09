@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
@@ -97,3 +98,5 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		TimeFunc: time.Now,
 	})
 }
+ */
+

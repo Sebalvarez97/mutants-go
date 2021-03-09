@@ -1,5 +1,6 @@
 package mutant
 
+/*
 import (
 	"github.com/Sebalvarez97/mutants/api/errors"
 	"github.com/Sebalvarez97/mutants/api/interfaces"
@@ -91,3 +92,5 @@ func (i MutantServiceImpl) GetMutantStats() (*model.Stats, *errors.ApiErrorImpl)
 		return model.NewStats(m, h, ratio), nil
 	}
 }
+ */
+

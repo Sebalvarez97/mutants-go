@@ -1,5 +1,6 @@
 package http
 
+/*
 import (
 	"bytes"
 	"encoding/json"
@@ -303,3 +304,5 @@ func TestGetStatsFailure(t *testing.T) {
 		assert.Equal(t, 500, rr.Code)
 	})
 }
+ */
+

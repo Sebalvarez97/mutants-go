@@ -2,7 +2,6 @@ package dao
 
 import (
 	"context"
-	"github.com/Sebalvarez97/mutants/api/interfaces"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -28,7 +27,7 @@ type MongoDaoImpl struct {
 	maxPoolSize uint64
 }
 
-func NewMongoDao(db string) interfaces.MongoDao {
+func NewMongoDao(db string) MongoDao {
 	uri := "mongodb://localhost:27017"
 	t, _ := time.ParseDuration("30s")
 	minPool, _ := strconv.ParseUint("100", 10, 64)

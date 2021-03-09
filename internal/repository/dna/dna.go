@@ -1,5 +1,6 @@
 package dna
 
+/*
 import (
 	"context"
 	"github.com/Sebalvarez97/mutants/api/errors"
@@ -183,3 +184,5 @@ func mapToObject(document *mongo.SingleResult) (model.Dna, *errors.ApiErrorImpl)
 	}
 	return dna, nil
 }
+ */
+
