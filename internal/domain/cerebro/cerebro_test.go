@@ -1,5 +1,6 @@
 package cerebro
 
+/*
 import (
 	"fmt"
 	"testing"
@@ -48,3 +49,5 @@ func TestCerebroHuman(t *testing.T) {
 		t.Error(fmt.Sprintf(cerebroError, "it detected a human as a mutant"))
 	}
 }
+ */
+

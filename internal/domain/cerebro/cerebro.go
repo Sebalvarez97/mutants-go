@@ -1,5 +1,6 @@
 package cerebro
 
+/*
 import "github.com/Sebalvarez97/mutants/api/interfaces"
 
 type CerebroService interface {
@@ -116,3 +117,5 @@ func checkDiagonalDownLeft(x int, y int, v byte, a [][]byte) int {
 	}
 	return 0
 }
+ */
+

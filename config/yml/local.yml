@@ -1,0 +1,4 @@
+gin:
+  router:
+    port: 8080
+    base-path: /api

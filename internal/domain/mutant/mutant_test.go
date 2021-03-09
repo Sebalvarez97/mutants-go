@@ -1,5 +1,6 @@
 package mutant
 
+/*
 import (
 	"fmt"
 	"github.com/Sebalvarez97/mutants/api/errors"
@@ -142,3 +143,5 @@ func TestGetMutantStatsOkWithCeroMutants(t *testing.T) {
 		t.Error(fmt.Sprintf(serviceError, "fail to get stats"))
 	}
 }
+ */
+

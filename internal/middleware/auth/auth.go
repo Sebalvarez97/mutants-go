@@ -1,5 +1,6 @@
 package auth
 
+/*
 import (
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
@@ -18,6 +19,27 @@ type User struct {
 	UserName  string
 	FirstName string
 	LastName  string
+}
+
+func SetUpAuth(r *gin.Engine) gin.HandlerFunc {
+	log.Println("Setting up auth")
+	authMiddleware, err := auth.GetAuthMiddleware()
+
+	if err != nil {
+		log.Fatal("JWT Error:" + err.Error())
+	}
+
+	authMiddlewareFunc := authMiddleware.MiddlewareFunc()
+
+	r.NoRoute(authMiddlewareFunc, func(c *gin.Context) {
+		claims := jwt.ExtractClaims(c)
+		log.Printf("NoRoute claims: %#v\n", claims)
+		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
+	})
+
+	r.Group("/auth").POST("/login", authMiddleware.LoginHandler).GET("/refresh_token", authMiddleware.RefreshHandler)
+
+	return authMiddlewareFunc
 }
 
 func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
@@ -97,3 +119,5 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		TimeFunc: time.Now,
 	})
 }
+ */
+
