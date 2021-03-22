@@ -1,0 +1,6 @@
+mongo:
+  db: "mutants"
+  uri: "mongodb://localhost:27017"
+  timeout: "30S"
+  min-pool: "100"
+  max-pool: "100"
