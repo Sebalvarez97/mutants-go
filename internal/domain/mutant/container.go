@@ -20,5 +20,5 @@ type DnaRepository interface {
 }
 
 func InitializeContainer(config config.Config) Container {
-	return Container{dna.NewDnaRepository(mongo.NewMongoDao(config.Mongo))}
+	return Container{dna.NewDnaRepository(mongo.NewMongoDao(config.Database))}
 }

@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"github.com/Sebalvarez97/mutants-go/db"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -25,9 +26,9 @@ type dao struct {
 	Options *options.ClientOptions
 }
 
-func NewMongoDao(config Config) MongoDao {
+func NewMongoDao(config db.Config) MongoDao {
 	uri := config.Uri
-	db := config.Db
+	database := config.Name
 	clientOptions := options.Client().ApplyURI(uri)
 	if t, err := time.ParseDuration(config.Timeout); err == nil {
 		clientOptions.SetConnectTimeout(t)
@@ -39,7 +40,7 @@ func NewMongoDao(config Config) MongoDao {
 		clientOptions.SetMaxPoolSize(maxPool)
 	}
 	return &dao{
-		db:      db,
+		db:      database,
 		Options: clientOptions,
 	}
 }

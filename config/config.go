@@ -2,7 +2,7 @@ package config
 
 import (
 	"fmt"
-	"github.com/Sebalvarez97/mutants-go/db/mongo"
+	"github.com/Sebalvarez97/mutants-go/db"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"log"
@@ -27,7 +27,7 @@ const (
 )
 
 type Config struct {
-	Mongo mongo.Config `yaml:"mongo"`
+	Database db.Config `yaml:"database"`
 }
 
 func GetConfig() Config {

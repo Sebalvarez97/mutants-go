@@ -2,11 +2,12 @@ package mutant
 
 import (
 	"context"
-	"github.com/Sebalvarez97/mutants-go/errors"
 	"github.com/Sebalvarez97/mutants-go/internal/domain/cerebro"
 	"github.com/Sebalvarez97/mutants-go/internal/domain/model"
 	"github.com/Sebalvarez97/mutants/api/util/matrix"
+	"golang.org/x/sync/errgroup"
 	"math"
+	"sync"
 )
 
 const (
@@ -14,8 +15,8 @@ const (
 )
 
 type Service interface {
-	IsMutant(ctx context.Context, dnaRequest model.IsMutantRequestBody) (bool, error)
 	GetMutantStats(ctx context.Context) (*model.Stats, error)
+	IsMutant(ctx context.Context, dnaRequest model.IsMutantRequestBody) (bool, error)
 }
 
 type service struct {
@@ -26,60 +27,50 @@ func NewService(container Container) Service {
 	return &service{container: container}
 }
 
+func (s *service) GetMutantStats(ctx context.Context) (*model.Stats, error) {
+	var mutants, humans int
+	var g errgroup.Group
+	g.Go(func() error {
+		m, err := s.container.DnaRepository.FindNumberOfMutants(ctx)
+		mutants = m
+		return err
+	})
+	g.Go(func() error {
+		h, err := s.container.DnaRepository.FindNumberOfHumans(ctx)
+		humans = h
+		return err
+	})
+	if err := g.Wait(); err != nil {
+		return &model.Stats{}, err
+	}
+	ratio := 1.0
+	if humans != 0 {
+		ratio = math.Round((float64(mutants)/float64(humans))*100) / 100
+	}
+	return model.NewStats(mutants, humans, ratio), nil
+}
+
 func (s *service) IsMutant(ctx context.Context, dnaRequest model.IsMutantRequestBody) (bool, error) {
+	var hash string
+	var mutant bool
+	var found int
+	var wg sync.WaitGroup
 	chain := dnaRequest.Dna
-	h, mutant := make(chan string), make(chan bool)
-
-	go func([]string, chan string) {
-		h <- matrix.GenerateHashForStringArray(chain)
-	}(chain, h)
-
-	go func([]string, chan bool, chan string) {
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		hash = matrix.GenerateHashForStringArray(chain)
+	}()
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		dna := make([][]byte, len(chain))
 		for i, v := range chain {
 			dna[i] = []byte(v)
 		}
-
-		is, found := cerebro.IsMutant(dna)
-		mutant <- is
-
-		_ = s.container.DnaRepository.Upsert(ctx, model.NewDna(<-h, is, found))
-	}(chain, mutant, h)
-
-	mut := <-mutant
-
-	return mut, nil
-}
-
-func (s *service) GetMutantStats(ctx context.Context) (*model.Stats, error) {
-	mutants, humans, e := make(chan int), make(chan int), make(chan errors.ApiError)
-
-	go func(chan int, chan errors.ApiError) {
-		m, err := s.container.DnaRepository.FindNumberOfMutants(ctx)
-		if err != nil {
-			e <- err.(errors.ApiError)
-		}
-		mutants <- m
-	}(mutants, e)
-
-	go func(chan int, chan errors.ApiError) {
-		h, err := s.container.DnaRepository.FindNumberOfHumans(ctx)
-		if err != nil {
-			e <- err.(errors.ApiError)
-		}
-		humans <- h
-	}(humans, e)
-
-	select {
-	case err := <-e:
-		return &model.Stats{}, &err
-	default:
-		m := <-mutants
-		h := <-humans
-		ratio := 1.0
-		if h != 0 {
-			ratio = math.Round((float64(m)/float64(h))*100) / 100
-		}
-		return model.NewStats(m, h, ratio), nil
-	}
+		mutant, found = cerebro.IsMutant(dna)
+	}()
+	wg.Wait()
+	go s.container.DnaRepository.Upsert(ctx, model.NewDna(hash, mutant, found))
+	return mutant, nil
 }

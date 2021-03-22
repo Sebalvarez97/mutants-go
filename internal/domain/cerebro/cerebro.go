@@ -7,13 +7,14 @@ import (
 )
 
 var (
-	found int
 	wg    sync.WaitGroup
 	mutex sync.Mutex
 	re    = regexp.MustCompile(`(A{4}|T{4}|G{4}|C{4})`)
 )
 
 func IsMutant(dna [][]byte) (bool, int) {
+	var found int
+
 	t := matrix.Transpose(dna)
 	d := matrix.Diagonals(dna)
 	dt := matrix.Diagonals(t)
