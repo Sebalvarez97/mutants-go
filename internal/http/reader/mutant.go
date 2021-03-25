@@ -29,8 +29,10 @@ func (m *mutantReaderHandler) GetStatsHandler(ctx *gin.Context) {
 	if err != nil {
 		if apiError, ok := err.(errors.ApiError); ok {
 			ctx.JSON(apiError.Code, apiError)
+		} else {
+			ctx.JSON(http.StatusInternalServerError, err)
 		}
-		ctx.JSON(http.StatusInternalServerError, err)
+	} else {
+		ctx.JSON(http.StatusOK, stats)
 	}
-	ctx.JSON(http.StatusOK, stats)
 }

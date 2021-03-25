@@ -1,7 +1,7 @@
 package db
 
 type Config struct {
-	Type    Type   `yaml:type`
+	Type    Type   `yaml:"type"`
 	Name    string `yaml:"name"`
 	Uri     string `yaml:"uri"`
 	Timeout string `yaml:"timeout,omitempty"`

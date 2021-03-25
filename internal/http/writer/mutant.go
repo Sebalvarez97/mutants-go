@@ -30,21 +30,25 @@ func (m *mutantWriterHandler) IsMutantHandler(ctx *gin.Context) {
 	if err := ctx.BindJSON(&json); err != nil {
 		apiErr := errors.BadRequestError(err)
 		ctx.JSON(apiErr.Code, apiErr)
-	}
-	if valid, message := json.IsValid(); !valid {
-		apiErr := errors.BadRequestError(fmt.Errorf(message))
-		ctx.JSON(apiErr.Code, apiErr)
-	}
-	is, err := m.mutantSrv.IsMutant(ctx, json)
-	if err != nil {
-		if apiError, ok := err.(errors.ApiError); ok {
-			ctx.JSON(apiError.Code, apiError)
-		}
-		ctx.JSON(http.StatusInternalServerError, err)
-	}
-	if is {
-		ctx.Status(http.StatusOK)
 	} else {
-		ctx.Status(http.StatusForbidden)
+		if valid, message := json.IsValid(); !valid {
+			apiErr := errors.BadRequestError(fmt.Errorf(message))
+			ctx.JSON(apiErr.Code, apiErr)
+		} else {
+			is, err := m.mutantSrv.IsMutant(ctx, json)
+			if err != nil {
+				if apiError, ok := err.(errors.ApiError); ok {
+					ctx.JSON(apiError.Code, apiError)
+				} else {
+					ctx.JSON(http.StatusInternalServerError, err)
+				}
+			} else {
+				if is {
+					ctx.Status(http.StatusOK)
+				} else {
+					ctx.Status(http.StatusForbidden)
+				}
+			}
+		}
 	}
 }
