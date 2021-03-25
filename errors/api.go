@@ -2,17 +2,19 @@ package errors
 
 import "fmt"
 
-const NotFoundCode = 404
-const NotFoundMessage = "Not Found because of %s"
+const (
+	NotFoundCode    = 404
+	NotFoundMessage = "Not Found because of %s"
 
-const InternalServerErrorCode = 500
-const InternalServerErrorMessage = "Server failed to perform request because of %s"
+	InternalServerErrorCode    = 500
+	InternalServerErrorMessage = "Server failed to perform request because of %s"
 
-const DBConnectionErrorCode = 500
-const DBConnectionErrorMessage = "Server failed to connect/disconnect from db because of %s"
+	DBConnectionErrorCode    = 500
+	DBConnectionErrorMessage = "Server failed to connect/disconnect from db because of %s"
 
-const BadRequestErrorCode = 400
-const BadRequestErrorMessage = "Invalid value entered: %s"
+	BadRequestErrorCode    = 400
+	BadRequestErrorMessage = "Invalid value entered: %s"
+)
 
 type ApiError struct {
 	error
