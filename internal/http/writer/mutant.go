@@ -2,7 +2,6 @@ package writer
 
 import (
 	"context"
-	"fmt"
 	"github.com/Sebalvarez97/mutants-go/errors"
 	"github.com/Sebalvarez97/mutants-go/internal/domain/model"
 	"github.com/gin-gonic/gin"
@@ -28,20 +27,19 @@ func NewMutantWriterHandler(service MutantService) MutantWriterHandler {
 func (m *mutantWriterHandler) IsMutantHandler(ctx *gin.Context) {
 	var json model.IsMutantRequestBody
 	if err := ctx.BindJSON(&json); err != nil {
-		apiErr := errors.BadRequestError(err)
-		ctx.JSON(apiErr.Code, apiErr)
+		apiErr := errors.NewJsonError(err.Error())
+		ctx.Error(apiErr)
+		return
 	} else {
 		if valid, message := json.IsValid(); !valid {
-			apiErr := errors.BadRequestError(fmt.Errorf(message))
-			ctx.JSON(apiErr.Code, apiErr)
+			apiErr := errors.NewValidationError(message)
+			ctx.Error(apiErr)
+			return
 		} else {
 			is, err := m.mutantSrv.IsMutant(ctx, json)
 			if err != nil {
-				if apiError, ok := err.(errors.ApiError); ok {
-					ctx.JSON(apiError.Code, apiError)
-				} else {
-					ctx.JSON(http.StatusInternalServerError, err)
-				}
+				ctx.Error(err)
+				return
 			} else {
 				if is {
 					ctx.Status(http.StatusOK)

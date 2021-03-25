@@ -6,7 +6,6 @@ import (
 	"github.com/Sebalvarez97/mutants-go/internal/domain/model"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"log"
 )
 
 const (
@@ -43,12 +42,11 @@ type repository struct {
 func (r *repository) FindByDnaHash(ctx context.Context, hash string) (*model.Dna, error) {
 	dna, err := r.dao.FindOne(ctx, bson.D{{"dna_hash", hash}}, collection)
 	if err != nil {
-		apiErr := errors.GenericError(err)
+		apiErr := errors.NewDbError(err.Error())
 		if err.Error() == notFoundErr {
-			apiErr = errors.NotFoundError(err)
+			apiErr = errors.NewNotFoundError("dna", hash)
 		}
-		log.Print(apiErr.Error())
-		return &model.Dna{}, &apiErr
+		return &model.Dna{}, apiErr
 	}
 	return mapToObject(ctx, dna)
 }
@@ -56,9 +54,8 @@ func (r *repository) FindByDnaHash(ctx context.Context, hash string) (*model.Dna
 func (r *repository) Upsert(ctx context.Context, dna *model.Dna) error {
 	err := r.update(ctx, dna.DnaHash, dna)
 	if err != nil {
-		if err.(errors.ApiError).Code == errors.NotFoundCode {
+		if _, ok := err.(errors.NotFoundError); ok {
 			err = r.insert(ctx, dna)
-			log.Print(err.Error())
 		}
 	}
 	return nil
@@ -66,9 +63,8 @@ func (r *repository) Upsert(ctx context.Context, dna *model.Dna) error {
 
 func (r *repository) insert(ctx context.Context, dna *model.Dna) error {
 	if err := r.dao.InsertOne(ctx, dna, collection); err != nil {
-		apiErr := errors.GenericError(err)
-		log.Print(apiErr.Error())
-		return &apiErr
+		apiErr := errors.NewDbError(err.Error())
+		return apiErr
 	}
 	return nil
 }
@@ -80,12 +76,11 @@ func (r *repository) update(ctx context.Context, hash string, dna *model.Dna) er
 	}
 	updateErr := r.dao.UpdateOne(ctx, bson.D{{"dna_hash", hash}}, bson.D{{"$set", bson.D{{"is_mutant", dna.IsMutant}, {"mutant_sequences", dna.MutantSequences}}}}, collection)
 	if updateErr != nil {
-		apiErr := errors.GenericError(updateErr)
+		apiErr := errors.NewDbError(updateErr.Error())
 		if updateErr.Error() == notFoundErr {
-			apiErr = errors.NotFoundError(updateErr)
+			apiErr = errors.NewNotFoundError("dna", hash)
 		}
-		log.Print(apiErr.Error())
-		return &apiErr
+		return apiErr
 	}
 	return nil
 }
@@ -94,9 +89,8 @@ func (r *repository) FindNumberOfHumans(ctx context.Context) (int, error) {
 	filter := bson.D{{"is_mutant", false}}
 	count, err := r.dao.CountForCollection(ctx, filter, collection)
 	if err != nil {
-		apiErr := errors.GenericError(err)
-		log.Print(apiErr.Error())
-		return 0, &apiErr
+		apiErr := errors.NewDbError(err.Error())
+		return 0, apiErr
 	}
 	return int(count), nil
 }
@@ -105,20 +99,18 @@ func (r *repository) FindNumberOfMutants(ctx context.Context) (int, error) {
 	filter := bson.D{{"is_mutant", true}}
 	count, err := r.dao.CountForCollection(ctx, filter, collection)
 	if err != nil {
-		apiErr := errors.GenericError(err)
-		log.Print(apiErr.Error())
-		return 0, &apiErr
+		apiErr := errors.NewDbError(err.Error())
+		return 0, apiErr
 	}
 	return int(count), nil
 }
 
 func mapToObjects(ctx context.Context, cur *mongo.Cursor) ([]model.Dna, error) {
 	var results []model.Dna
-	err := cur.All(context.TODO(), &results)
+	err := cur.All(ctx, &results)
 	if err != nil {
-		apiErr := errors.GenericError(err)
-		log.Print(apiErr.Error())
-		return results, &apiErr
+		apiErr := errors.NewMappingError(err.Error())
+		return results, apiErr
 	}
 	return results, nil
 }
@@ -127,9 +119,8 @@ func mapToObject(ctx context.Context, document *mongo.SingleResult) (*model.Dna,
 	var dna model.Dna
 	err := document.Decode(&dna)
 	if err != nil {
-		apiErr := errors.GenericError(err)
-		log.Print(apiErr.Error())
-		return &dna, &apiErr
+		apiErr := errors.NewMappingError(err.Error())
+		return &dna, apiErr
 	}
 	return &dna, nil
 }

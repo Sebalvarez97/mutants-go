@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"github.com/Sebalvarez97/mutants-go/errors"
 	jwt "github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"log"
+	"net/http"
 	"time"
 )
 
@@ -112,7 +114,7 @@ func GetAuthMiddleWare(r *gin.Engine) gin.HandlerFunc {
 	r.NoRoute(authMiddlewareFunc, func(c *gin.Context) {
 		claims := jwt.ExtractClaims(c)
 		log.Printf("NoRoute claims: %#v\n", claims)
-		c.JSON(404, gin.H{"code": "PAGE_NOT_FOUND", "message": "Page not found"})
+		c.JSON(http.StatusNotFound, errors.NewNotFoundErrorWithoutId(c.Request.RequestURI))
 	})
 
 	r.Group("/auth").POST("/login", authMiddleware.LoginHandler).GET("/refresh_token", authMiddleware.RefreshHandler)

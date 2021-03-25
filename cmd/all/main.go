@@ -47,6 +47,9 @@ func run() error {
 	authMiddleWare := middleware.GetAuthMiddleWare(r)
 	r.Use(authMiddleWare)
 
+	errorHandler := middleware.GetCustomErrorHandler()
+	r.Use(errorHandler)
+
 	routerHandler.RouteURLs(r)
 
 	log.Printf("Will run on port: %v\n", port)
