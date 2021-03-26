@@ -2,7 +2,6 @@ package reader
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/Sebalvarez97/mutants-go/errors"
 	"github.com/Sebalvarez97/mutants-go/internal/domain/model"
 	"github.com/gin-gonic/gin"
@@ -77,7 +76,7 @@ func TestMutantReaderHandler_GetStatsHandler(t *testing.T) {
 		readerHandler := newFakeMutantReaderHandler()
 		routerHandler := NewRouterHandler(readerHandler.MutantReaderHandler)
 
-		readerHandler.MutantSrv.Mock.On("GetMutantStats", mock.Anything).Return(nil, errors.DbConnectionError(fmt.Errorf("db connection error")))
+		readerHandler.MutantSrv.Mock.On("GetMutantStats", mock.Anything).Return(nil, errors.NewDbError("db connection error"))
 
 		rr := httptest.NewRecorder()
 		router := gin.Default()
