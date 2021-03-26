@@ -3,7 +3,6 @@ package mutant
 import (
 	"context"
 	"github.com/Sebalvarez97/mutants-go/config"
-	"github.com/Sebalvarez97/mutants-go/db/mongo"
 	"github.com/Sebalvarez97/mutants-go/internal/domain/model"
 	"github.com/Sebalvarez97/mutants-go/internal/repository/dna"
 )
@@ -20,5 +19,5 @@ type DnaRepository interface {
 }
 
 func InitializeContainer(config config.Config) Container {
-	return Container{dna.NewDnaRepository(mongo.NewMongoDao(config.Database))}
+	return Container{dna.NewDnaRepository(dna.NewMongoDao(config.Database))}
 }

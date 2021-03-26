@@ -13,7 +13,7 @@ const (
 	notFoundErr = "mongo: no documents in result"
 )
 
-type DnaRepository interface {
+type Repository interface {
 	FindByDnaHash(ctx context.Context, hash string) (*model.Dna, error)
 	Upsert(ctx context.Context, dna *model.Dna) error
 	insert(ctx context.Context, dna *model.Dna) error
@@ -31,7 +31,7 @@ type MongoDao interface {
 	UpdateOne(ctx context.Context, filter bson.D, update bson.D, collectionName string) error
 }
 
-func NewDnaRepository(dao MongoDao) DnaRepository {
+func NewDnaRepository(dao MongoDao) Repository {
 	return &repository{dao: dao}
 }
 
