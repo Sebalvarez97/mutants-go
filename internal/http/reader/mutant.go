@@ -26,9 +26,8 @@ func NewMutantReaderHandler(service MutantService) MutantReaderHandler {
 func (m *mutantReaderHandler) GetStatsHandler(ctx *gin.Context) {
 	stats, err := m.mutantSrv.GetMutantStats(ctx)
 	if err != nil {
-		ctx.Error(err)
+		_ = ctx.Error(err)
 		return
-	} else {
-		ctx.JSON(http.StatusOK, stats)
 	}
+	ctx.JSON(http.StatusOK, stats)
 }

@@ -19,7 +19,7 @@ func TestCustomErrorHandler(t *testing.T) {
 		router.Use(errorHandler)
 
 		router.Handle(http.MethodGet, "/test", func(context *gin.Context) {
-			context.Error(errors.NewValidationError("error validating something"))
+			_ = context.Error(errors.NewValidationError("error validating something"))
 		})
 
 		request, err := http.NewRequest(http.MethodGet, "/test", nil)
@@ -39,7 +39,7 @@ func TestCustomErrorHandler(t *testing.T) {
 		router.Use(errorHandler)
 
 		router.Handle(http.MethodGet, "/test", func(context *gin.Context) {
-			context.Error(errors.NewCommunicationError("error communicating something", context.Request.RequestURI, 412))
+			_ = context.Error(errors.NewCommunicationError("error communicating something", context.Request.RequestURI, 412))
 		})
 
 		request, err := http.NewRequest(http.MethodGet, "/test", nil)
@@ -60,7 +60,7 @@ func TestCustomErrorHandler(t *testing.T) {
 
 		router.Handle(http.MethodGet, "/test/:id", func(context *gin.Context) {
 			id := context.Param("id")
-			context.Error(errors.NewNotFoundError("test_resource", id))
+			_ = context.Error(errors.NewNotFoundError("test_resource", id))
 		})
 
 		request, err := http.NewRequest(http.MethodGet, "/test/1234", nil)
@@ -80,7 +80,7 @@ func TestCustomErrorHandler(t *testing.T) {
 		router.Use(errorHandler)
 
 		router.Handle(http.MethodGet, "/test", func(context *gin.Context) {
-			context.Error(errors.NewNotFoundErrorWithoutId("test_resource"))
+			_ = context.Error(errors.NewNotFoundErrorWithoutId("test_resource"))
 		})
 
 		request, err := http.NewRequest(http.MethodGet, "/test", nil)
@@ -100,7 +100,7 @@ func TestCustomErrorHandler(t *testing.T) {
 		router.Use(errorHandler)
 
 		router.Handle(http.MethodGet, "/test", func(context *gin.Context) {
-			context.Error(errors.NewAuthorizationError("fail to authorize", "auth_fail"))
+			_ = context.Error(errors.NewAuthorizationError("fail to authorize", "auth_fail"))
 		})
 
 		request, err := http.NewRequest(http.MethodGet, "/test", nil)
@@ -120,7 +120,7 @@ func TestCustomErrorHandler(t *testing.T) {
 		router.Use(errorHandler)
 
 		router.Handle(http.MethodGet, "/test", func(context *gin.Context) {
-			context.Error(fmt.Errorf("generic error"))
+			_ = context.Error(fmt.Errorf("generic error"))
 		})
 
 		request, err := http.NewRequest(http.MethodGet, "/test", nil)

@@ -44,11 +44,11 @@ func run() error {
 
 	log.Printf("Setting up auth...\n")
 
-	authMiddleWare := middleware.GetAuthMiddleWare(r)
-	r.Use(authMiddleWare)
-
 	errorHandler := middleware.GetCustomErrorHandler()
 	r.Use(errorHandler)
+
+	authMiddleWare := middleware.GetAuthMiddleWare(r)
+	r.Use(authMiddleWare)
 
 	routerHandler.RouteURLs(r)
 

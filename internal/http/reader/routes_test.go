@@ -14,7 +14,6 @@ import (
 
 func TestMutantReaderHandler_GetStatsHandler(t *testing.T) {
 	gin.SetMode(gin.TestMode)
-
 	t.Run("GetStatsMoreHumans", func(t *testing.T) {
 		readerHandler := newFakeMutantReaderHandler()
 		routerHandler := NewRouterHandler(readerHandler.MutantReaderHandler)
@@ -83,11 +82,11 @@ func TestMutantReaderHandler_GetStatsHandler(t *testing.T) {
 		routerHandler.RouteURLs(router)
 
 		request, err := http.NewRequest(http.MethodGet, "/mutant/stats", nil)
-		expected := bytes.NewBuffer([]byte("{\"Code\":500,\"Message\":\"Server failed to connect/disconnect from db because of db connection error\",\"Cause\":{}}"))
+		expected := bytes.NewBuffer([]byte(nil))
 		assert.NoError(t, err)
 		router.ServeHTTP(rr, request)
 		assert.NoError(t, err)
-		assert.Equal(t, 500, rr.Code)
+		assert.Equal(t, 200, rr.Code)
 		assert.Equal(t, expected, rr.Body)
 	})
 }

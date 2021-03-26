@@ -26,27 +26,24 @@ func NewMutantWriterHandler(service MutantService) MutantWriterHandler {
 
 func (m *mutantWriterHandler) IsMutantHandler(ctx *gin.Context) {
 	var json model.IsMutantRequestBody
-	if err := ctx.BindJSON(&json); err != nil {
+	if err := ctx.ShouldBindJSON(&json); err != nil {
 		apiErr := errors.NewJsonError(err.Error())
-		ctx.Error(apiErr)
+		_ = ctx.Error(apiErr)
 		return
+	}
+	if valid, message := json.IsValid(); !valid {
+		apiErr := errors.NewValidationError(message)
+		_ = ctx.Error(apiErr)
+		return
+	}
+	is, err := m.mutantSrv.IsMutant(ctx, json)
+	if err != nil {
+		_ = ctx.Error(err)
+		return
+	}
+	if is {
+		ctx.Status(http.StatusOK)
 	} else {
-		if valid, message := json.IsValid(); !valid {
-			apiErr := errors.NewValidationError(message)
-			ctx.Error(apiErr)
-			return
-		} else {
-			is, err := m.mutantSrv.IsMutant(ctx, json)
-			if err != nil {
-				ctx.Error(err)
-				return
-			} else {
-				if is {
-					ctx.Status(http.StatusOK)
-				} else {
-					ctx.Status(http.StatusForbidden)
-				}
-			}
-		}
+		ctx.Status(http.StatusForbidden)
 	}
 }
